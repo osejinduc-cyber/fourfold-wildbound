@@ -1,0 +1,47 @@
+{
+  "id": "glimmerwood-kin",
+  "name": "Glimmerwood Kin",
+  "version": "1.0.0",
+  "author": "Fourfold Community",
+  "icon": "🦊",
+  "description": "Meet three new wild companions: the lantern-eyed Glimmerfox, the burrowing Mossling and the rideable Brackenback.",
+  "tags": [
+    "creatures",
+    "companions",
+    "mounts"
+  ],
+  "content": {
+    "creatures": [
+      {
+        "id": "glimmerfox",
+        "name": "Glimmerfox",
+        "color": 13008230,
+        "face": 16768941,
+        "hp": 26,
+        "damage": 5,
+        "speed": 3.2,
+        "mount": false
+      },
+      {
+        "id": "mossling",
+        "name": "Mossling",
+        "color": 8235129,
+        "face": 13427369,
+        "hp": 34,
+        "damage": 4,
+        "speed": 1.7,
+        "mount": false
+      },
+      {
+        "id": "brackenback",
+        "name": "Brackenback",
+        "color": 7439452,
+        "face": 13680020,
+        "hp": 65,
+        "damage": 9,
+        "speed": 2.3,
+        "mount": true
+      }
+    ]
+  }
+}
