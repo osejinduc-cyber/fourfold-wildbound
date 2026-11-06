@@ -1,13 +1,21 @@
-# FOURFOLD: WILDBOUND Mod Packs
+# FOURFOLD 0.6 Modding
 
-This prototype uses safe JSON data manifests. Packs can add item definitions, recipes, and journal lore. Some items may be marked as placeable blocks or consumables. The current format does not execute arbitrary JavaScript.
+The in-game marketplace downloads JSON manifests from `marketplace/packs/`. Mods are enabled locally in the browser and can be removed or disabled from **My Mods**.
 
-## Install
-1. Open Mods & Add-ons in the game.
-2. Choose Import JSON Mod and select a manifest.
-3. Enable the imported pack.
-4. Open Crafting to discover its recipes.
+Use the Marketplace's **Download +** action, **Import File**, or **Import URL**. Direct URL imports must use HTTPS and point to a JSON manifest.
 
-See examples/example-celestial-tools.json for a starter manifest. IDs must be unique lowercase identifiers. Recipes may refer only to base-game items or items supplied by enabled packs.
+Supported content arrays:
+- `items`: item definitions and optional placeable/consumable data.
+- `creatures`: custom creatures, stats and optional mount flag.
+- `dimensions`: palette, biome resource, hazard and guardian for a new generated realm.
+- `weapons`: weapon stats and damage.
+- `vehicles`: traversal speed and item data.
+- `quests`: resource requirements and item/XP rewards.
+- `recipes`: craftable outputs and costs.
+- `lore`: journal entries.
 
-Future mod API goals include custom creatures, dimension content, structures, scripted behaviours in a sandbox, and custom 3D assets. These advanced extension points are not implemented in this prototype.
+See `marketplace/pack-schema.json` and the examples in `marketplace/packs/`.
+
+The current mod loader is data-only. It does not execute JavaScript or HTML from downloaded packs. Custom 3D model imports, animation rigs and script-based AI behaviours are future API work.
+
+To submit a pack, add a unique JSON manifest under `marketplace/packs/`, add a matching entry to `marketplace/catalog.json`, and open a pull request. Submissions are reviewed before being added to the in-game catalogue.
