@@ -1,0 +1,59 @@
+{
+  "id": "windbound-vehicles",
+  "name": "Windbound Vehicles",
+  "version": "1.0.0",
+  "author": "Fourfold Community",
+  "icon": "🛷",
+  "description": "Craft two traversal upgrades: a wind skiff for open terrain and an Umbral strider for difficult ground. Select one and press R or V to ride.",
+  "tags": [
+    "vehicles",
+    "traversal",
+    "crafting"
+  ],
+  "content": {
+    "vehicles": [
+      {
+        "id": "wind-skiff",
+        "name": "Wind Skiff",
+        "icon": "🛷",
+        "speed": 12,
+        "description": "A light gliding vehicle for long overland journeys."
+      },
+      {
+        "id": "umbral-strider",
+        "name": "Umbral Strider",
+        "icon": "🦿",
+        "speed": 10.5,
+        "description": "A sturdy rune-powered walker built for dangerous terrain."
+      }
+    ],
+    "recipes": [
+      {
+        "id": "craft-wind-skiff",
+        "label": "Wind Skiff",
+        "desc": "Fast open-world traversal.",
+        "cost": {
+          "wood": 8,
+          "cloudglass": 3,
+          "fibre": 4
+        },
+        "out": {
+          "wind-skiff": 1
+        }
+      },
+      {
+        "id": "craft-umbral-strider",
+        "label": "Umbral Strider",
+        "desc": "A reinforced expedition vehicle.",
+        "cost": {
+          "stone": 8,
+          "lumen": 3,
+          "ore": 4
+        },
+        "out": {
+          "umbral-strider": 1
+        }
+      }
+    ]
+  }
+}
