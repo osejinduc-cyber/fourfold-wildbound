@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FOURFOLD Data Pack",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "version",
+    "author",
+    "icon",
+    "description",
+    "content"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{2,48}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 72
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "author": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "icon": {
+      "type": "string",
+      "maxLength": 8
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 24
+      },
+      "maxItems": 12
+    },
+    "content": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "maxItems": 80,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        "creatures": {
+          "type": "array",
+          "maxItems": 80,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        "dimensions": {
+          "type": "array",
+          "maxItems": 80,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ]
+          }
+        },
+        "weapons": {
+          "type": "array",
+          "maxItems": 80,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "damage"
+            ]
+          }
+        },
+        "vehicles": {
+          "type": "array",
+          "maxItems": 80,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "speed"
+            ]
+          }
+        },
+        "quests": {
+          "type": "array",
+          "maxItems": 80,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "description"
+            ]
+          }
+        },
+        "recipes": {
+          "type": "array",
+          "maxItems": 80,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label",
+              "cost",
+              "out"
+            ]
+          }
+        },
+        "lore": {
+          "type": "array",
+          "maxItems": 80,
+          "items": {
+            "type": "object",
+            "required": [
+              "title",
+              "text"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
