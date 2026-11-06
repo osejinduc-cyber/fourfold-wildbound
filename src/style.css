@@ -4,3 +4,12 @@
 
 .import-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.submit-link{text-decoration:none;display:inline-flex;align-items:center;min-height:36px;padding:0 12px;font-size:9px;letter-spacing:.08em}.market-footnote a{color:var(--sage);margin-left:7px}.market-footnote a:hover{color:#fff}
 .boss-health{position:absolute;top:158px;left:50%;transform:translateX(-50%);width:min(420px,78vw);padding:9px 13px;background:#170f10d9;border:1px solid #d58d7066;border-radius:4px;text-align:center}.boss-health small{display:block;color:#dfad88;font-size:8px;letter-spacing:.2em}.boss-health b{display:block;font:600 15px 'Playfair Display',serif;margin:3px 0 7px}.boss-health>div{height:7px;background:#492b2c;border-radius:5px;overflow:hidden}.boss-health i{display:block;width:100%;height:100%;background:linear-gradient(90deg,#a3453e,#e19068);transition:width .15s}
+/* FOURFOLD 0.7 — Living Worlds HUD and marketplace categories */
+.thirst-fill{background:linear-gradient(90deg,#4f9bc1,#83c9d4)}
+.warmth-fill{background:linear-gradient(90deg,#bb7440,#e6b46c)}
+.market-art.settlement{background:radial-gradient(circle,#a8c58a55,transparent 52%),linear-gradient(135deg,#3d5638,#14231b)}
+.market-art.dungeon{background:radial-gradient(circle,#c38c6a55,transparent 52%),linear-gradient(135deg,#493329,#171c1b)}
+.market-art.survival{background:radial-gradient(circle,#76b7b055,transparent 52%),linear-gradient(135deg,#244d48,#13231d)}
+.companion-role{background:#0b1912;border:1px solid var(--line);border-radius:3px;color:var(--text);padding:8px;min-width:112px;font-size:10px}
+.recipe .action-button:disabled{opacity:.35;cursor:not-allowed}
+@media(max-width:760px){.status-stack{max-width:190px}.status-line{grid-template-columns:12px 76px 20px}}
