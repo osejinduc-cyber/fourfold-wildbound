@@ -1,0 +1,50 @@
+name: Community pack submission
+description: Submit a JSON data pack for review in the FOURFOLD in-game marketplace.
+title: "[Community Pack]: "
+labels: ["community-content"]
+body:
+  - type: input
+    id: pack_name
+    attributes:
+      label: Pack name
+      description: The name players will see in the marketplace.
+      placeholder: e.g. Glimmerwood Kin
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - creature
+        - dimension
+        - weapon
+        - vehicle
+        - quest
+        - expansion
+    validations:
+      required: true
+  - type: input
+    id: manifest_url
+    attributes:
+      label: Direct HTTPS JSON manifest URL
+      description: Link to a raw GitHub JSON manifest or other stable HTTPS JSON URL.
+      placeholder: https://raw.githubusercontent.com/...
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What does your pack add?
+      description: List its items, creatures, quests, dimensions, weapons or vehicles.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Creator confirmation
+      options:
+        - label: I created this content or have permission to redistribute it.
+          required: true
+        - label: The manifest is data-only and contains no executable scripts, HTML or malware.
+          required: true
