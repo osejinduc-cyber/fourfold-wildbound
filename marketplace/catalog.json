@@ -1,0 +1,93 @@
+[
+  {
+    "id": "glimmerwood-kin",
+    "name": "Glimmerwood Kin",
+    "version": "1.0.0",
+    "author": "Fourfold Community",
+    "icon": "🦊",
+    "description": "Meet three new wild companions: the lantern-eyed Glimmerfox, the burrowing Mossling and the rideable Brackenback.",
+    "tags": [
+      "creatures",
+      "companions",
+      "mounts"
+    ],
+    "category": "creature",
+    "download": "./marketplace/packs/glimmerwood-kin.json"
+  },
+  {
+    "id": "shattered-meridian",
+    "name": "Shattered Meridian",
+    "version": "1.0.0",
+    "author": "Fourfold Community",
+    "icon": "🌌",
+    "description": "A fifth, community-made realm of fractured crystal shelves and drifting monoliths. Explore its luminous ravines and challenge the Meridian Sentinel.",
+    "tags": [
+      "dimension",
+      "exploration",
+      "boss"
+    ],
+    "category": "dimension",
+    "download": "./marketplace/packs/shattered-meridian.json"
+  },
+  {
+    "id": "astral-armory",
+    "name": "Astral Armory",
+    "version": "1.0.0",
+    "author": "Fourfold Community",
+    "icon": "⚔️",
+    "description": "A pair of dimension-forged weapons for high-risk expeditions: the Starfall Glaive and Riftglass Saber.",
+    "tags": [
+      "weapons",
+      "combat",
+      "crafting"
+    ],
+    "category": "weapon",
+    "download": "./marketplace/packs/astral-armory.json"
+  },
+  {
+    "id": "windbound-vehicles",
+    "name": "Windbound Vehicles",
+    "version": "1.0.0",
+    "author": "Fourfold Community",
+    "icon": "🛷",
+    "description": "Craft two traversal upgrades: a wind skiff for open terrain and an Umbral strider for difficult ground. Select one and press R or V to ride.",
+    "tags": [
+      "vehicles",
+      "traversal",
+      "crafting"
+    ],
+    "category": "vehicle",
+    "download": "./marketplace/packs/windbound-vehicles.json"
+  },
+  {
+    "id": "cartographers-lost-roads",
+    "name": "The Cartographer's Lost Roads",
+    "version": "1.0.0",
+    "author": "Fourfold Community",
+    "icon": "📜",
+    "description": "A short side-story following the Pale Cartographer's abandoned trail. Recover a survey cache and piece together a route that predates the Sundering.",
+    "tags": [
+      "quests",
+      "lore",
+      "story"
+    ],
+    "category": "quest",
+    "download": "./marketplace/packs/cartographers-lost-roads.json"
+  },
+  {
+    "id": "echoes-of-the-heart-loom",
+    "name": "Echoes of the Heart Loom",
+    "version": "1.0.0",
+    "author": "Fourfold Community",
+    "icon": "💠",
+    "description": "A compact expansion bundle with a new echo-realm, a rare companion, a story quest and a relic weapon. A glimpse of how full community expansions can combine content types.",
+    "tags": [
+      "expansion",
+      "dimension",
+      "creature",
+      "quest"
+    ],
+    "category": "expansion",
+    "download": "./marketplace/packs/echoes-of-the-heart-loom.json"
+  }
+]
