@@ -1,0 +1,94 @@
+{
+  "id": "echoes-of-the-heart-loom",
+  "name": "Echoes of the Heart Loom",
+  "version": "1.0.0",
+  "author": "Fourfold Community",
+  "icon": "💠",
+  "description": "A compact expansion bundle with a new echo-realm, a rare companion, a story quest and a relic weapon. A glimpse of how full community expansions can combine content types.",
+  "tags": [
+    "expansion",
+    "dimension",
+    "creature",
+    "quest"
+  ],
+  "content": {
+    "dimensions": [
+      {
+        "id": "echoing-crucible",
+        "name": "Echoing Crucible",
+        "description": "A realm of resonant stone, suspended ruins and pulsing sound-waves.",
+        "sky": 4799314,
+        "fog": 7890054,
+        "ground": 5524320,
+        "top": 11641533,
+        "soil": 4076873,
+        "rock": 9076374,
+        "water": 6708876,
+        "accent": 15780492,
+        "hazard": "Resonance Pulse",
+        "resource": "Echo Crystal",
+        "guardian": "The Resonant One",
+        "icon": "💠"
+      }
+    ],
+    "creatures": [
+      {
+        "id": "loomling",
+        "name": "Loomling",
+        "color": 14203788,
+        "face": 16312773,
+        "hp": 30,
+        "damage": 6,
+        "speed": 2.7,
+        "mount": false
+      }
+    ],
+    "weapons": [
+      {
+        "id": "heartspun-maul",
+        "name": "Heartspun Maul",
+        "icon": "🔨",
+        "damage": 34,
+        "description": "A relic hammer woven from the Loom's old harmonics."
+      }
+    ],
+    "recipes": [
+      {
+        "id": "craft-heartspun-maul",
+        "label": "Heartspun Maul",
+        "desc": "A heavy relic weapon.",
+        "cost": {
+          "lumen": 4,
+          "cloudglass": 3,
+          "ore": 5
+        },
+        "out": {
+          "heartspun-maul": 1
+        }
+      }
+    ],
+    "quests": [
+      {
+        "id": "echoes-unanswered",
+        "name": "Echoes Unanswered",
+        "description": "Gather 4 Lumen Shards to stabilise the echoing path.",
+        "requirement": {
+          "item": "lumen",
+          "count": 4
+        },
+        "reward": {
+          "xp": 140,
+          "items": {
+            "tonic": 2
+          }
+        }
+      }
+    ],
+    "lore": [
+      {
+        "title": "A Note Between Worlds",
+        "text": "When the Loom broke, not every fragment fell. Some became places. Others became living things."
+      }
+    ]
+  }
+}
