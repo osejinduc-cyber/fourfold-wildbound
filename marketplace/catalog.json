@@ -89,5 +89,50 @@
     ],
     "category": "expansion",
     "download": "./marketplace/packs/echoes-of-the-heart-loom.json"
+  },
+  {
+    "id": "settlers-toolkit",
+    "name": "Settler's Toolkit",
+    "version": "1.0.0",
+    "author": "Fourfold Community",
+    "icon": "🏡",
+    "description": "Hearthwood building pieces, glowing waymarkers and a settlement supply quest.",
+    "tags": [
+      "settlement",
+      "building",
+      "decor"
+    ],
+    "category": "settlement",
+    "download": "./marketplace/packs/settlers-toolkit.json"
+  },
+  {
+    "id": "deepvault-expeditions",
+    "name": "Deepvault Expeditions",
+    "version": "1.0.0",
+    "author": "Fourfold Community",
+    "icon": "🗝️",
+    "description": "A relic-hunting side story and two weapons for dangerous vault runs.",
+    "tags": [
+      "dungeon",
+      "relics",
+      "weapons"
+    ],
+    "category": "dungeon",
+    "download": "./marketplace/packs/deepvault-expeditions.json"
+  },
+  {
+    "id": "wilds-survival-provisions",
+    "name": "Wilds Survival Provisions",
+    "version": "1.0.0",
+    "author": "Fourfold Community",
+    "icon": "🧭",
+    "description": "New foods, drinks and recipes for longer journeys across the realms.",
+    "tags": [
+      "survival",
+      "cooking",
+      "supplies"
+    ],
+    "category": "survival",
+    "download": "./marketplace/packs/wilds-survival-provisions.json"
   }
 ]
