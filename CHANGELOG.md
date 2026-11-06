@@ -1,5 +1,43 @@
 # Changelog
 
+## 0.7.0 — The Living Worlds Update
+
+### Expanding worlds
+- Expanded the active world window to a seven-by-seven grid of 16×16 chunks around the Wayfarer.
+- Extended the finite procedural travel boundary and kept chunk creation deterministic from the world seed and realm.
+- Fixed instance-aware terrain mining so a single terrain cube is removed instead of deleting its entire instanced batch.
+- Persisted mined terrain, harvested trees and ore nodes across chunk unload/reload, with realm-specific depletion IDs.
+- Kept campfire warmth local to the realm where the campfire was placed.
+
+### Wildlife and companions
+- Added patrol, forage, flee, hunt, group-alert and low-health retreat behaviours to the lightweight creature AI.
+- Added companion field roles: Follow, Guard and Forager, with a companion role panel.
+- Guard companions periodically damage nearby threats; Forager companions periodically return a small fibre supply.
+
+### Dungeons and combat progression
+- Rebuilt the Forgotten Vault entrance with more substantial stonework and a rune seal.
+- Turned vault combat into three escalating depths, ending with a Vaultheart Custodian.
+- Added repeat-run records that raise later vault enemy durability and damage, with improved completion rewards.
+- Kept the vault boss separate from the four core realm guardians and their Anchor Shard progression.
+
+### Settlement and survival
+- Added a Verdant settlement ledger at the Seed Beacon and a B-key shortcut.
+- Added buildable homesteads, Sunberry farms, workshops and watchtowers, with residents, settlement population, reputation and five Beacon levels.
+- Farms produce a small berry harvest over time while the expedition is active.
+- Expanded survival from health/hunger/stamina to health, hunger, thirst, warmth and stamina.
+- Added craftable waterskins, warming stew, campfires and reusable bedroll rest.
+- Added thirst and warmth meters to the HUD and realm-specific environmental pressure.
+
+### Community marketplace
+- Expanded the catalogue from six to nine downloadable data packs.
+- Added Settler's Toolkit, Deepvault Expeditions and Wilds Survival Provisions.
+- Added Settlement, Dungeon and Survival marketplace filters and validator category support.
+- Kept the marketplace data-only; no downloaded JavaScript or HTML is executed.
+
+### Save compatibility
+- Versioned new world saves as 0.7 and migrated existing 0.6 saves forward in the browser.
+- Added persistence for settlement structures/residents, companion roles, dungeon records, depleted resources and campfire locations.
+
 ## 0.6.0 — Fourfold Frontier
 
 ### Core game
