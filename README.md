@@ -1,4 +1,4 @@
-# FOURFOLD: WILDBOUND · Version 0.6
+# FOURFOLD: WILDBOUND · Version 0.7 — The Living Worlds Update
 
 An original 3D voxel open-world survival adventure prototype. Explore four procedural realms, gather resources, craft gear, build shelters, bond with wild creatures, defeat guardians, and expand your expedition with downloadable community content.
 
@@ -28,13 +28,18 @@ The Heart Loom once linked four dimensions. The Sundering shattered it into four
 - **Skyreach** — elevated terrain, floating isles and cloudglass.
 - **Umbral Wilds** — shrouded groves, glowing relics and stamina pressure.
 
-Each realm is procedurally generated from its own terrain palette and height rules. The map in this prototype is a bounded expedition region rather than an infinite streamed world.
+Each realm is built from deterministic 16×16 terrain chunks. Seven-by-seven chunk windows stream around the Wayfarer and unload behind the player; the generated expedition has a large finite travel boundary, so it is expanding terrain rather than an unlimited server world. Terrain edits and harvested resource nodes persist in local saves.
 
-## Current 0.6 gameplay
+## Current 0.7 gameplay
 - First-person 3D movement, mouse look, jump, sprint, pointer lock and crosshair.
+- Chunk-streamed procedural terrain with a wider active world window, stable chunk generation and a large finite exploration boundary.
+- Persistent mining/building: mining a terrain instance removes that individual block, and placed blocks, mined terrain and harvested tree/ore nodes remain changed after chunk reloads.
 - Procedural voxel terrain, trees, rocks, resource nodes, ruins, portals, Seed Beacons and Forgotten Vault entrances.
 - Mine blocks and ore nodes, gather wood/fibre, collect realm resources, place building blocks and persist placed/mined block edits in browser saves.
-- Survival health, hunger and stamina; hostile creatures can chase and attack; respawn returns the Wayfarer to the expedition start.
+- Deeper survival with health, hunger, thirst, warmth and stamina. Waterskins, cooked provisions, campfires and bedrolls support long journeys; Umbral cold and Cinderdeep hazards create different preparation needs.
+- Creature behaviours now include patrol, pursuit, group alerting, retreat and passive wildlife fleeing/foraging. Bonded companions can Follow, Guard or Forage.
+- Forgotten Vaults use three escalating combat depths, an elite Custodian and repeat-run difficulty/reward records.
+- Verdantia can grow into a settlement: build homesteads, farms, workshops and watchtowers; increase its level, population and reputation; farms produce food while the player explores.
 - Hotbar, inventory, selectable items, recipes and field crafting.
 - Craftable mining tools, axe, blade, healing tonic, Resonance Cage, timber/stone blocks and a raft recipe.
 - Capture creatures with **F**, command bonded companions with **Q**, and mount a bonded mountable creature with **R**.
@@ -43,7 +48,7 @@ Each realm is procedurally generated from its own terrain palette and height rul
 - Forgotten Vault combat encounter with three sentinels and a resource reward.
 - Main quest progression: awaken at the Seed Beacon, craft a first tool, discover another realm, recover the first Anchor, collect all four shards and confront the Pale Cartographer.
 - A village NPC encounter, local Chronicle/journal, level/XP and skill point rewards.
-- Local save data in browser storage: player stats/location, inventory, quest progress, realm discoveries, Anchor Shards, bonded companions and block edits.
+- Local save data in browser storage: player stats/location, inventory, survival meters, quest progress, realm discoveries, Anchor Shards, bonded companions/roles, settlement structures/population, dungeon records, campfires, depleted resource nodes and terrain/build edits.
 - Creative Mode toggle (**C**) for no-cost building and relaxed exploration.
 
 ### Controls
@@ -59,6 +64,8 @@ Each realm is procedurally generated from its own terrain palette and height rul
 | E | Interact with nearby beacon, gate, NPC, tree or vault |
 | F | Attempt to bond with a nearby creature |
 | Q | Toggle bonded companion follow |
+| P | Open companion roles (Follow / Guard / Forager) |
+| B | Open the Verdant settlement ledger near the Seed Beacon |
 | R | Mount / dismount or activate / park selected vehicle |
 | V | Use selected food or vehicle |
 | I | Inventory |
@@ -72,13 +79,16 @@ Each realm is procedurally generated from its own terrain palette and height rul
 ## Community Mod Marketplace
 Open **Mod Marketplace** from the main menu, or press **F2** while exploring. The catalogue is stored at `marketplace/catalog.json`; downloadable JSON manifests live in `marketplace/packs/`.
 
-Six sample downloads are included:
+Nine sample downloads are included:
 1. **Glimmerwood Kin** — three new creatures, including a rideable Brackenback.
 2. **Shattered Meridian** — a fifth playable procedural realm and its Meridian Sentinel guardian.
 3. **Astral Armory** — Starfall Glaive and Riftglass Saber, plus crafting recipes.
 4. **Windbound Vehicles** — Wind Skiff and Umbral Strider traversal vehicles.
 5. **The Cartographer's Lost Roads** — material-gathering side quests with XP and item rewards.
 6. **Echoes of the Heart Loom** — a bundled expansion with a realm, creature, relic weapon, quest and lore.
+7. **Settler's Toolkit** — placeable decorative building pieces and a settlement supply quest.
+8. **Deepvault Expeditions** — two new weapons, a relic-hunting quest and lore.
+9. **Wilds Survival Provisions** — additional drinks and meals that restore thirst, warmth and health.
 
 ### Install and manage packs
 - Choose **Download +** on a marketplace card. The manifest is fetched from this repository and installed in the current browser profile.
@@ -98,7 +108,7 @@ Six sample downloads are included:
 - `recipes` — craftable outputs and material costs.
 - `lore` — journal discoveries.
 
-Packs are data-only. The game does not run downloaded JavaScript, HTML, or executable scripts. Custom animation rigs, model files, hand-built maps and script-based AI behaviours are future modding API work.
+Packs are data-only. The game does not run downloaded JavaScript, HTML, or executable scripts. Custom animation rigs, model files, hand-built maps and script-based AI behaviours remain future modding API work.
 
 See [marketplace/README.md](marketplace/README.md) and [marketplace/pack-schema.json](marketplace/pack-schema.json).
 
@@ -110,11 +120,11 @@ This repository uses a curated static catalogue rather than an online account/do
 Use unique IDs, describe required gameplay, and only submit content you have permission to share.
 
 ## Project scope — important
-0.6 is an early single-player browser prototype and a foundation for a larger project. It is not a finished commercial-scale open-world game.
+0.7 is still an early single-player browser prototype, not a finished commercial-scale open-world game. The chunk system streams a large finite procedural region; it is not infinite terrain or a shared world server. The new creature, dungeon and settlement systems are lightweight gameplay foundations rather than full simulation systems.
 
-Not implemented yet: online multiplayer, persistent shared servers, streaming/infinite terrain chunks, advanced farming/fishing/cooking, complex building physics, detailed settlement populations, quest dialogue trees, multi-stage raid dungeons, full animation/rigging, custom 3D model import, script-based mods, paid marketplace transactions, creator accounts, ratings/reviews and automatic community publishing.
+Not implemented yet: online multiplayer, persistent shared servers, unlimited/unbounded world generation, full pathfinding and navigation meshes, complex predator/prey ecosystems, NPC daily schedules and a player-driven settlement economy, structural building physics, deep farming seasons/irrigation, puzzle-based multi-room dungeon layouts, custom 3D model/animation import, script-based mods, paid marketplace transactions, creator accounts, ratings/reviews and automatic community publishing.
 
-The marketplace does download and install the six JSON content packs above; it is not yet a global hosted marketplace service with accounts or community ratings. New pack submissions require repository review and catalogue updates.
+The marketplace does download and install the nine JSON content packs above; it is not yet a global hosted marketplace service with accounts or community ratings. New pack submissions require repository review and catalogue updates.
 
 ## Credits and inspiration
 FOURFOLD: WILDBOUND uses original names, lore, code and data. It takes broad genre inspiration from open-world survival, creature-collecting and voxel exploration games, without using proprietary game assets.
