@@ -1,0 +1,53 @@
+{
+  "id": "cartographers-lost-roads",
+  "name": "The Cartographer's Lost Roads",
+  "version": "1.0.0",
+  "author": "Fourfold Community",
+  "icon": "📜",
+  "description": "A short side-story following the Pale Cartographer's abandoned trail. Recover a survey cache and piece together a route that predates the Sundering.",
+  "tags": [
+    "quests",
+    "lore",
+    "story"
+  ],
+  "content": {
+    "quests": [
+      {
+        "id": "lost-survey-cache",
+        "name": "The Lost Survey Cache",
+        "description": "Gather 5 Ironstone to rebuild an old survey instrument.",
+        "requirement": {
+          "item": "ore",
+          "count": 5
+        },
+        "reward": {
+          "xp": 80,
+          "items": {
+            "lumen": 1
+          }
+        }
+      },
+      {
+        "id": "lanterns-before-dawn",
+        "name": "Lanterns Before Dawn",
+        "description": "Gather 3 Lumen Shards to relight the forgotten road markers.",
+        "requirement": {
+          "item": "lumen",
+          "count": 3
+        },
+        "reward": {
+          "xp": 110,
+          "items": {
+            "tonic": 1
+          }
+        }
+      }
+    ],
+    "lore": [
+      {
+        "title": "Surveyor's Field Note",
+        "text": "The Pale Cartographer did not map places. They mapped the choices that led to them."
+      }
+    ]
+  }
+}
