@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "marketplace" / "catalog.json"
 PACK_DIR = ROOT / "marketplace" / "packs"
-CATEGORIES = {"creature", "dimension", "weapon", "vehicle", "quest", "expansion"}
+CATEGORIES = {"creature", "dimension", "weapon", "vehicle", "quest", "expansion", "settlement", "dungeon", "survival"}
 COLLECTIONS = {"items", "creatures", "dimensions", "weapons", "vehicles", "quests", "recipes", "lore"}
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{2,48}$")
 CONTENT_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{1,48}$")
