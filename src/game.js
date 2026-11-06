@@ -28,7 +28,7 @@ const RECIPES = [
   {id:'raft',label:'Wayfarer Raft',cost:{wood:12,fibre:6},out:{raft:1},desc:'A basic water vehicle.'}
 ];
 const state = {
-  realm:'Verdantia', player:{x:0,y:4,z:8}, health:100,hunger:100,stamina:100, inventory:{wood:0,stone:0,fibre:0,berry:2,meat:1,ore:0,ember:0,cloudglass:0,lumen:0,wildseed:0,shard:0}, hotbar:['pick','axe','blade','berry','wall','stonewall','cage','raft'], selected:0, mode:'survival', shards:[], tamed:[], quests:['awakening'], completed:[], discovered:['Verdantia'], lastSaved:0, mount:null, glider:false, activeDungeon:false, level:1, xp:0, skillPoints:0
+  realm:'Verdantia', worldSeed:47391, player:{x:0,y:4,z:8}, health:100,hunger:100,thirst:100,warmth:100,stamina:100, settlement:{level:1,beaconCharge:100,structures:0}, inventory:{wood:0,stone:0,fibre:0,berry:2,meat:1,ore:0,ember:0,cloudglass:0,lumen:0,wildseed:0,shard:0}, hotbar:['pick','axe','blade','berry','wall','stonewall','cage','raft'], selected:0, mode:'survival', shards:[], tamed:[], quests:['awakening'], completed:[], discovered:['Verdantia'], lastSaved:0, mount:null, glider:false, activeDungeon:false, level:1, xp:0, skillPoints:0
 };
 const quests = [
  {id:'awakening',name:'The Sleeping Beacon',desc:'Reach the Seed Beacon in Verdantia and discover what woke you.',reward:'A map fragment and 30 XP.'},
@@ -52,7 +52,7 @@ const cubeGeo=new THREE.BoxGeometry(1,1,1);
 const sphereGeo=new THREE.SphereGeometry(.5,10,8);
 const mats={};
 function material(color,rough=.88,metal=0,emissive=0){const k=[color,rough,metal,emissive].join(':');if(!mats[k])mats[k]=new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,emissive:emissive||0,emissiveIntensity:emissive?1:0});return mats[k]}
-const worldGroup=new THREE.Group();scene.add(worldGroup);
+const worldGroup=new THREE.Group();scene.add(worldGroup);\nconst CHUNK_SIZE=16,CHUNK_RADIUS=2;let loadedChunks=new Map(),lastChunkCenter='';
 let blocks=[], enemies=[], creatures=[], interactables=[], particles=[], trees=[], worldObjects=[];
 const raycaster=new THREE.Raycaster();raycaster.far=7;
 const pointer=new THREE.Vector2(0,0);
@@ -72,32 +72,117 @@ function getInstalled(){try{return JSON.parse(localStorage.getItem(MOD_STORAGE)|
 function setInstalled(packs){localStorage.setItem(MOD_STORAGE,JSON.stringify(packs));updateModCounts();if(started){const keep={x:player.x,z:player.z};generateRealm(state.realm);player.x=keep.x;player.z=keep.z;player.y=terrainHeight(Math.round(player.x),Math.round(player.z))+1.65;camera.position.set(player.x,player.y,player.z);saveGame(false);}}
 function contentOf(key){return enabledPacks().flatMap(p=>p.content?.[key]||[]);}
 function getRealmDef(name){return REALMS[name]||contentOf('dimensions').find(d=>d.name===name)||{id:name.toLowerCase().replace(/[^a-z0-9]+/g,'-'),sky:0x34475c,fog:0x4b5366,ground:0x4b5962,top:0x8294a4,soil:0x34404a,rock:0x7b8995,water:0x4e8290,accent:0xc4d6e6,hazard:'Anomaly',resource:'Aether Dust',guardian:'Rift Guardian',icon:'✦',desc:'A community-created realm.'};}
-function createCube(x,y,z,color,drop='stone',opts={}){const mesh=new THREE.Mesh(cubeGeo,material(color,opts.rough??.9,opts.metal??0,opts.emissive??0));mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;mesh.userData={drop,hardness:opts.hardness??1,block:true,placeable:true,gridX:x,gridY:y,gridZ:z};worldGroup.add(mesh);blocks.push(mesh);worldObjects.push(mesh);return mesh;}
-function addPlant(x,z,def){const g=new THREE.Group();const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.13,.2,def.tall||2.5,6),material(def.trunk||0x76553a));trunk.position.y=(def.tall||2.5)/2;trunk.castShadow=true;g.add(trunk);for(let i=0;i<3;i++){const leaf=new THREE.Mesh(new THREE.DodecahedronGeometry(1.1-i*.13,0),material(def.leaf||0x416d46));leaf.position.set((i%2?-.3:.3),(def.tall||2.5)-.2+i*.35,(i===1?.2:-.1));leaf.castShadow=true;g.add(leaf)}g.position.set(x,terrainHeight(x,z)+.5,z);g.userData={kind:'tree',drop:'wood'};worldGroup.add(g);interactables.push(g);trees.push(g);return g;}
-function addRock(x,z,color,drop='stone',scale=1){const m=new THREE.Mesh(new THREE.DodecahedronGeometry(.7*scale,0),material(color,.8,.12));m.position.set(x,terrainHeight(x,z)+.35*scale,z);m.scale.set(1,1.1,.9);m.castShadow=true;m.userData={kind:'ore',drop,block:true,hardness:drop==='stone'?1:1.4};worldGroup.add(m);blocks.push(m);worldObjects.push(m);return m;}
+function createCube(x,y,z,color,drop='stone',opts={}){const mesh=new THREE.Mesh(cubeGeo,material(color,opts.rough??.9,opts.metal??0,opts.emissive??0));mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;mesh.userData={drop,hardness:opts.hardness??1,block:true,placeable:true,gridX:x,gridY:y,gridZ:z,chunkKey:opts.chunkKey||null};(opts.parent||worldGroup).add(mesh);blocks.push(mesh);worldObjects.push(mesh);return mesh;}
+function addPlant(x,z,def,parent=worldGroup,chunkKey=null){const g=new THREE.Group();const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.13,.2,def.tall||2.5,6),material(def.trunk||0x76553a));trunk.position.y=(def.tall||2.5)/2;trunk.castShadow=true;g.add(trunk);for(let i=0;i<3;i++){const leaf=new THREE.Mesh(new THREE.DodecahedronGeometry(1.1-i*.13,0),material(def.leaf||0x416d46));leaf.position.set((i%2?-.3:.3),(def.tall||2.5)-.2+i*.35,(i===1?.2:-.1));leaf.castShadow=true;g.add(leaf)}g.position.set(x,terrainHeight(x,z)+.5,z);g.userData={kind:'tree',drop:'wood',chunkKey};parent.add(g);interactables.push(g);trees.push(g);return g;}
+function addRock(x,z,color,drop='stone',scale=1,parent=worldGroup,chunkKey=null){const m=new THREE.Mesh(new THREE.DodecahedronGeometry(.7*scale,0),material(color,.8,.12));m.position.set(x,terrainHeight(x,z)+.35*scale,z);m.scale.set(1,1.1,.9);m.castShadow=true;m.userData={kind:'ore',drop,block:true,hardness:drop==='stone'?1:1.4,chunkKey};parent.add(m);blocks.push(m);worldObjects.push(m);return m;}
 function hash(x,z,seed=0){let n=Math.sin(x*127.1+z*311.7+seed*74.7)*43758.5453;return n-Math.floor(n);}
-function terrainHeight(x,z){const def=getRealmDef(state.realm);let base=1.5+Math.sin(x*.18)*1.15+Math.cos(z*.16)*1.05+Math.sin((x+z)*.095)*1.1;let h=base+(hash(Math.round(x),Math.round(z),state.realm.length)-.5)*1.3;if(state.realm==='Skyreach')h+=Math.max(0,Math.sin(x*.16+z*.1))*1.8;if(state.realm==='Cinderdeep')h+=Math.max(0,Math.sin(x*.23)*Math.cos(z*.2))*1.3;if(state.realm==='Umbral Wilds')h+=Math.sin(x*.35)*.7;return Math.floor(clamp(h,0,6));}
-function clearWorld(){while(worldGroup.children.length){const o=worldGroup.children[worldGroup.children.length-1];worldGroup.remove(o);if(o.geometry!==cubeGeo&&o.geometry!==sphereGeo)o.geometry?.dispose?.();}blocks=[];enemies=[];creatures=[];interactables=[];particles=[];trees=[];worldObjects=[];vehicleRig=null;targetBlock=targetEnemy=targetCreature=null;}
+function terrainHeight(x,z){const def=getRealmDef(state.realm);let base=1.5+Math.sin(x*.18)*1.15+Math.cos(z*.16)*1.05+Math.sin((x+z)*.095)*1.1;let h=base+(hash(Math.round(x),Math.round(z),state.worldSeed+(state.realm.length*31))-.5)*1.3;if(state.realm==='Skyreach')h+=Math.max(0,Math.sin(x*.16+z*.1))*1.8;if(state.realm==='Cinderdeep')h+=Math.max(0,Math.sin(x*.23)*Math.cos(z*.2))*1.3;if(state.realm==='Umbral Wilds')h+=Math.sin(x*.35)*.7;return Math.floor(clamp(h,0,6));}
+function clearWorld(){while(worldGroup.children.length){const o=worldGroup.children[worldGroup.children.length-1];worldGroup.remove(o);if(o.geometry!==cubeGeo&&o.geometry!==sphereGeo)o.geometry?.dispose?.();}blocks=[];enemies=[];creatures=[];interactables=[];particles=[];trees=[];worldObjects=[];loadedChunks=new Map();lastChunkCenter='';vehicleRig=null;targetBlock=targetEnemy=targetCreature=null;}
 function addBuilding(x,z,kind='ruin'){const group=new THREE.Group();const d=getRealmDef(state.realm);const stone=material(d.rock,.93);for(let i=0;i<5;i++){const h=new THREE.Mesh(cubeGeo,stone);h.position.set(x+i-2,terrainHeight(x+i-2,z)+1,z);h.scale.set(1,2.5,1);h.castShadow=true;group.add(h)}const beam=new THREE.Mesh(cubeGeo,material(d.accent,.5,.1,.35));beam.position.set(x,terrainHeight(x,z)+3,z);beam.scale.set(5,.25,.4);group.add(beam);worldGroup.add(group);interactables.push({position:group.position, userData:{kind,group}});return group;}
 function makeBeacon(){const g=new THREE.Group();const d=getRealmDef(state.realm);const base=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.5,.8,8),material(d.rock));base.position.y=.4;base.castShadow=true;g.add(base);const ring=new THREE.Mesh(new THREE.TorusGeometry(1.35,.12,8,24),material(d.accent,.25,.2,.5));ring.position.y=2;ring.rotation.x=Math.PI/2;g.add(ring);const core=new THREE.Mesh(new THREE.OctahedronGeometry(.75),material(d.accent,.18,.25,.9));core.position.y=2;g.add(core);g.position.set(-7,terrainHeight(-7,1),1);g.userData={kind:'beacon'};worldGroup.add(g);interactables.push(g);return g;}
 function makePortal(){const g=new THREE.Group();const d=getRealmDef(state.realm);const ring=new THREE.Mesh(new THREE.TorusGeometry(1.8,.18,8,32),material(d.accent,.25,.2,.6));ring.position.y=2;g.add(ring);const portal=new THREE.Mesh(new THREE.CircleGeometry(1.58,32),new THREE.MeshBasicMaterial({color:d.accent,transparent:true,opacity:.18,side:THREE.DoubleSide}));portal.position.y=2;g.add(portal);g.position.set(7,terrainHeight(7,-2),-2);g.userData={kind:'portal'};worldGroup.add(g);interactables.push(g);for(let i=0;i<4;i++){const p=new THREE.Mesh(new THREE.OctahedronGeometry(.25),material(d.accent,.2,.2,.8));const a=i*Math.PI/2;p.position.set(2.2*Math.cos(a),2+2.2*Math.sin(a),0);g.add(p)}return g;}
 function makeDungeon(){const g=new THREE.Group();const d=getRealmDef(state.realm);const stone=material(d.rock);for(let i=0;i<5;i++){const pillar=new THREE.Mesh(cubeGeo,stone);pillar.position.set(i-2,1,0);pillar.scale.set(.9,2.8,.9);pillar.castShadow=true;g.add(pillar)}const cap=new THREE.Mesh(cubeGeo,material(d.accent,.4,.1,.25));cap.position.set(0,2.7,0);cap.scale.set(5,.3,1.2);g.add(cap);g.position.set(0,terrainHeight(0,-12),-12);g.userData={kind:'dungeon'};worldGroup.add(g);interactables.push(g);return g;}
-function addCreature(def,x,z,hostile=false,boss=false,stableId=null){const group=new THREE.Group();const color=def.color||0x92a879;const body=new THREE.Mesh(new THREE.DodecahedronGeometry(boss?1.3:.55,0),material(color,.7,.05,boss?.15:0));body.position.y=boss?1.5:.7;body.castShadow=true;group.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(boss?.55:.32,10,8),material(def.face||0xd8c79f));head.position.set(0,boss?2.35:1.15,.48);head.castShadow=true;group.add(head);for(let i=0;i<4;i++){const leg=new THREE.Mesh(cubeGeo,material(def.leg||color));leg.position.set(i<2?-.32:.32,.28,i%2?-.28:.28);leg.scale.set(.15,.6,.15);group.add(leg)}group.position.set(x,terrainHeight(x,z),z);const creatureId=stableId||def.id||uid();group.userData={kind:'creature',id:creatureId,name:def.name||'Wildling',hp:def.hp||25,maxHp:def.hp||25,hostile,boss,tamed:state.tamed.includes(creatureId),follow:state.tamed.includes(creatureId),damage:def.damage||5,speed:def.speed||1.5,def,attack:0};worldGroup.add(group);if(hostile||boss)enemies.push(group);else creatures.push(group);return group;}
+function addCreature(def,x,z,hostile=false,boss=false,stableId=null,chunkKey=null,parent=worldGroup){const group=new THREE.Group();const color=def.color||0x92a879;const body=new THREE.Mesh(new THREE.DodecahedronGeometry(boss?1.3:.55,0),material(color,.7,.05,boss?.15:0));body.position.y=boss?1.5:.7;body.castShadow=true;group.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(boss?.55:.32,10,8),material(def.face||0xd8c79f));head.position.set(0,boss?2.35:1.15,.48);head.castShadow=true;group.add(head);for(let i=0;i<4;i++){const leg=new THREE.Mesh(cubeGeo,material(def.leg||color));leg.position.set(i<2?-.32:.32,.28,i%2?-.28:.28);leg.scale.set(.15,.6,.15);group.add(leg)}group.position.set(x,terrainHeight(x,z),z);const creatureId=stableId||def.id||uid();group.userData={kind:'creature',id:creatureId,name:def.name||'Wildling',hp:def.hp||25,maxHp:def.hp||25,hostile,boss,tamed:state.tamed.includes(creatureId),follow:state.tamed.includes(creatureId),damage:def.damage||5,speed:def.speed||1.5,def,attack:0,chunkKey,aiState:hostile?'stalk':'wander',nextThink:0,patrolAngle:hash(x,z,19)*Math.PI*2};group.userData.chunkKey=chunkKey;parent.add(group);if(hostile||boss)enemies.push(group);else creatures.push(group);return group;}
 let boss=null,beacon=null,portal=null,dungeon=null,vehicleRig=null;
-function generateRealm(name){state.realm=name;const d=getRealmDef(name);clearWorld();scene.background=new THREE.Color(d.sky);scene.fog.color.setHex(d.fog);scene.fog.density=name==='Umbral Wilds'?.022:.012;sun.color.setHex(name==='Cinderdeep'?0xff9c68:name==='Umbral Wilds'?0xc3b2ef:0xffe7bd);sun.intensity=name==='Cinderdeep'?1.6:2.5;
-const size=24;for(let x=-size;x<=size;x++)for(let z=-size;z<=size;z++){const h=terrainHeight(x,z);const c=hash(x,z,4);const top=(name==='Verdantia'&&c>.95)?0x899b65:d.top;createCube(x,h,z,top,name==='Verdantia'?'fibre':name==='Cinderdeep'?'ember':name==='Skyreach'?'cloudglass':'lumen',{hardness:1});if(h<2)createCube(x,h-1,z,d.soil,'stone');}
-for(let i=0;i<34;i++){const x=Math.floor(hash(i,2,21)*34-17),z=Math.floor(hash(i,5,22)*34-17);if(Math.abs(x)<6&&Math.abs(z)<6)continue;if(name==='Verdantia'||hash(i,7,23)>.35)addPlant(x,z,{tall:2.2+hash(i,6,4)*1.6,leaf:name==='Umbral Wilds'?0x546d7b:name==='Cinderdeep'?0x634333:name==='Skyreach'?0x789e9b:0x416b45});}
-for(let i=0;i<42;i++){const x=Math.floor(hash(i,10,12)*34-17),z=Math.floor(hash(i,11,13)*34-17);if(Math.abs(x)<5&&Math.abs(z)<5)continue;const rare=hash(i,12,15)>.72;const drop=rare?(name==='Verdantia'?'ore':name==='Cinderdeep'?'ember':name==='Skyreach'?'cloudglass':'lumen'):'stone';addRock(x,z,rare?d.accent:d.rock,drop,rare?.85:1);}
-if(name==='Skyreach'){for(let i=0;i<5;i++){const x=-15+i*7,z=-15+(i%2)*12;const island=new THREE.Mesh(new THREE.DodecahedronGeometry(2.6,0),material(0x8caaa6));island.position.set(x,10+hash(i,5,7)*4,z);island.scale.y=.45;island.castShadow=true;worldGroup.add(island);}}
-for(let i=0;i<5;i++){const x=Math.floor(hash(i,3,99)*26-13),z=Math.floor(hash(i,4,98)*26-13);addBuilding(x,z,'ruin');}
-beacon=makeBeacon();portal=makePortal();dungeon=makeDungeon();if(name==='Verdantia')makeNpc('Mira, the Rootkeeper',-11,-7,'The old paths are growing over. I remember the Heart Loom before the Sundering. Find the first Anchor Shard and I may remember more.',[{name:'Lost Seed Pouch',description:'Search a forgotten ruin for a seed pouch.'}]);else makeNpc(name==='Cinderdeep'?'Korr the Emberwright':name==='Skyreach'?'Sella Cloudwalker':'Ilyr the Gloamkeeper',-11,-7,'The realm has changed since the Sundering. The guardian keeps an Anchor Shard. Prepare before you challenge it.',[{name:'A Realm Remembered',description:'Explore the nearby ruins and return with a realm relic.'}]);
-const creaturePacks=contentOf('creatures');const native=name==='Verdantia'?[{name:'Mossback',color:0x77916a,face:0xb9c59c,hp:40,damage:6,speed:2.2,mount:true},{name:'Glimmerfox',color:0xc57a5e,face:0xe9c7a5,hp:20,damage:4,speed:3}]:name==='Cinderdeep'?[{name:'Cindermite',color:0xc45d3f,face:0xffc06a,hp:24,damage:7,speed:2.2},{name:'Ashhorn',color:0x534847,face:0xff9f64,hp:50,damage:12,speed:1.8,mount:true}]:name==='Skyreach'?[{name:'Cloudwing',color:0x9dc4ca,face:0xe5f1e9,hp:28,damage:5,speed:3,mount:true},{name:'Aeriesprite',color:0xa5bce1,face:0xf2e6ff,hp:18,damage:4,speed:2.8}]:[{name:'Gloamstag',color:0x566276,face:0xc2b4dd,hp:35,damage:8,speed:2,mount:true},{name:'Lumenling',color:0x97a6b6,face:0xe1d8ff,hp:18,damage:4,speed:2.6}];
-for(let i=0;i<12;i++){const x=hash(i,15,9)*30-15,z=hash(i,17,10)*30-15;const def=native[i%native.length];addCreature(def,x,z,false,false,'native-'+getRealmDef(name).id+'-'+i);}
-for(const def of creaturePacks){const x=hash(def.id.length,6,11)*24-12,z=hash(def.id.length,8,12)*24-12;addCreature(def,x,z,false,false,'mod-'+def.id);}
-for(let i=0;i<8;i++){const x=hash(i,21,21)*26-13,z=hash(i,22,22)*26-13;addCreature({name:['Brambleling','Ash Wisp','Rift Stalker','Hollow Knight'][REALMS[name]?Object.keys(REALMS).indexOf(name):0]||'Rift Stalker',color:name==='Cinderdeep'?0x8f402c:name==='Umbral Wilds'?0x48465b:0x5b5044,face:d.accent,hp:28,damage:6,speed:1.5},x,z,true,false,'hostile-'+getRealmDef(name).id+'-'+i);}
-const bossDef={name:d.guardian,color:name==='Cinderdeep'?0xc94b32:name==='Skyreach'?0x7f9ea9:name==='Umbral Wilds'?0x5b4e76:0x566e3b,face:d.accent,hp:130,damage:15,speed:1.2};boss=state.shards.includes(name)?null:addCreature(bossDef,12,-15,true,true,'boss-'+getRealmDef(name).id);if(boss)boss.visible=true;
-for(const def of contentOf('dimensions')){} // custom dimension content is selected from the atlas; the standard realm generator also applies to it.
-applyWorldEdits(name);state.discovered=[...new Set([...state.discovered,name])];player.x=0;player.z=8;player.y=terrainHeight(0,8)+2;camera.position.set(player.x,player.y+1.2,player.z);renderRealm();renderHotbar();renderStats();updateObjective();saveGame(false);}
+function chunkKey(cx,cz){return cx+','+cz;}
+function chunkCoord(v){return Math.floor(v/CHUNK_SIZE);}
+function editKey(x,y,z){return Math.round(x)+','+Math.round(y)+','+Math.round(z);}
+function removedEditSet(realm){return new Set((state.worldEdits?.[realm]||[]).filter(e=>e.type==='remove').map(e=>editKey(e.x,e.y,e.z)));}
+function makeTerrainBatch(parent,entries,color,drop,key){
+ if(!entries.length)return null;
+ const mesh=new THREE.InstancedMesh(cubeGeo,material(color,.96),entries.length);
+ const matrix=new THREE.Matrix4();
+ entries.forEach((p,i)=>{matrix.makeTranslation(p.x,p.y,p.z);mesh.setMatrixAt(i,matrix);});
+ mesh.instanceMatrix.needsUpdate=true;mesh.castShadow=false;mesh.receiveShadow=true;mesh.userData={terrainChunk:true,positions:entries,drop,chunkKey:key,hardness:1};
+ mesh.computeBoundingSphere();parent.add(mesh);blocks.push(mesh);worldObjects.push(mesh);return mesh;
+}
+function nativeCreaturesForRealm(name){
+ if(name==='Verdantia')return [{name:'Mossback',color:0x77916a,face:0xb9c59c,hp:40,damage:6,speed:2.2,mount:true},{name:'Glimmerfox',color:0xc57a5e,face:0xe9c7a5,hp:20,damage:4,speed:3}];
+ if(name==='Cinderdeep')return [{name:'Cindermite',color:0xc45d3f,face:0xffc06a,hp:24,damage:7,speed:2.2},{name:'Ashhorn',color:0x534847,face:0xff9f64,hp:50,damage:12,speed:1.8,mount:true}];
+ if(name==='Skyreach')return [{name:'Cloudwing',color:0x9dc4ca,face:0xe5f1e9,hp:28,damage:5,speed:3,mount:true},{name:'Aeriesprite',color:0xa5bce1,face:0xf2e6ff,hp:18,damage:4,speed:2.8}];
+ return [{name:'Gloamstag',color:0x566276,face:0xc2b4dd,hp:35,damage:8,speed:2,mount:true},{name:'Lumenling',color:0x97a6b6,face:0xe1d8ff,hp:18,damage:4,speed:2.6}];
+}
+function applyChunkEdits(key,cx,cz,parent){
+ const edits=state.worldEdits?.[state.realm]||[];
+ for(const edit of edits){if(edit.type!=='place')continue;const ex=chunkCoord(edit.x),ez=chunkCoord(edit.z);if(ex===cx&&ez===cz)createCube(edit.x,edit.y,edit.z,edit.color,edit.drop||'stone',{hardness:1,parent,chunkKey:key});}
+}
+function generateChunk(cx,cz){
+ const key=chunkKey(cx,cz);if(loadedChunks.has(key))return;
+ const parent=new THREE.Group();parent.userData.chunkKey=key;worldGroup.add(parent);
+ const def=getRealmDef(state.realm),removed=removedEditSet(state.realm),surface=[],soil=[],deep=[];
+ const startX=cx*CHUNK_SIZE,startZ=cz*CHUNK_SIZE;
+ for(let lx=0;lx<CHUNK_SIZE;lx++)for(let lz=0;lz<CHUNK_SIZE;lz++){
+  const x=startX+lx,z=startZ+lz,h=terrainHeight(x,z);
+  if(!removed.has(editKey(x,h,z)))surface.push({x,y:h,z});
+  for(let y=0;y<h;y++)if(!removed.has(editKey(x,y,z)))soil.push({x,y,z});
+  for(let y=-2;y<0;y++)if(!removed.has(editKey(x,y,z)))deep.push({x,y,z});
+ }
+ const surfaceDrop=state.realm==='Verdantia'?'fibre':state.realm==='Cinderdeep'?'ember':state.realm==='Skyreach'?'cloudglass':'lumen';
+ makeTerrainBatch(parent,surface,def.top,surfaceDrop,key);
+ makeTerrainBatch(parent,soil,def.soil,'stone',key);
+ makeTerrainBatch(parent,deep,def.rock,'stone',key);
+ // Features are derived from world coordinates and the expedition seed, so reloading a chunk recreates it consistently.
+ for(let i=0;i<3;i++){
+  const x=startX+2+Math.floor(hash(cx*17+i,cz*29+i,state.worldSeed+31)*12);
+  const z=startZ+2+Math.floor(hash(cx*23+i,cz*11+i,state.worldSeed+47)*12);
+  if(Math.abs(x)<7&&Math.abs(z)<7)continue;
+  if(state.realm!=='Cinderdeep'||hash(cx+i,cz-i,state.worldSeed+62)>.32)addPlant(x,z,{tall:2.1+hash(x,z,state.worldSeed+1)*1.8,leaf:state.realm==='Umbral Wilds'?0x546d7b:state.realm==='Cinderdeep'?0x634333:state.realm==='Skyreach'?0x789e9b:0x416b45},parent,key);
+ }
+ for(let i=0;i<3;i++){
+  const x=startX+1+Math.floor(hash(cx*7+i,cz*13+i,state.worldSeed+72)*14);
+  const z=startZ+1+Math.floor(hash(cx*19+i,cz*5+i,state.worldSeed+88)*14);
+  if(Math.abs(x)<5&&Math.abs(z)<5)continue;
+  const rare=hash(x,z,state.worldSeed+93)>.83;
+  const drop=rare?(state.realm==='Verdantia'?'ore':state.realm==='Cinderdeep'?'ember':state.realm==='Skyreach'?'cloudglass':'lumen'):'stone';
+  addRock(x,z,rare?def.accent:def.rock,drop,rare?.85:1,parent,key);
+ }
+ if(state.realm==='Skyreach'&&hash(cx,cz,state.worldSeed+104)>.35){
+  const island=new THREE.Mesh(new THREE.DodecahedronGeometry(3.1,0),material(0x8caaa6));
+  island.position.set(startX+8,10+hash(cx,cz,state.worldSeed+105)*6,startZ+8);island.scale.y=.42;island.castShadow=true;parent.add(island);
+ }
+ if(hash(cx,cz,state.worldSeed+111)>.91)addBuilding(startX+8,startZ+8,'ruin');
+ const wildlife=nativeCreaturesForRealm(state.realm),community=contentOf('creatures');
+ if(hash(cx,cz,state.worldSeed+121)>.48){
+  const x=startX+4+hash(cx,cz,state.worldSeed+122)*8,z=startZ+4+hash(cx,cz,state.worldSeed+123)*8;
+  const def=community.length&&hash(cx,cz,state.worldSeed+124)>.7?community[Math.floor(hash(cx,cz,state.worldSeed+125)*community.length)]:wildlife[Math.floor(hash(cx,cz,state.worldSeed+126)*wildlife.length)];
+  addCreature(def,x,z,false,false,'wild-'+getRealmDef(state.realm).id+'-'+key+'-'+def.name, key,parent);
+ }
+ if(hash(cx,cz,state.worldSeed+131)>.78){
+  const x=startX+4+hash(cx,cz,state.worldSeed+132)*8,z=startZ+4+hash(cx,cz,state.worldSeed+133)*8;
+  const hostileName=['Brambleling','Ash Wisp','Rift Stalker','Hollow Knight'][Object.keys(REALMS).indexOf(state.realm)]||'Rift Stalker';
+  addCreature({name:hostileName,color:state.realm==='Cinderdeep'?0x8f402c:state.realm==='Umbral Wilds'?0x48465b:0x5b5044,face:def.accent,hp:28,damage:6,speed:1.5},x,z,true,false,'hostile-'+getRealmDef(state.realm).id+'-'+key,key,parent);
+ }
+ applyChunkEdits(key,cx,cz,parent);
+ loadedChunks.set(key,{group:parent,cx,cz});
+}
+function updateChunks(x,z,force=false){
+ const ccx=chunkCoord(x),ccz=chunkCoord(z),center=chunkKey(ccx,ccz);
+ if(!force&&center===lastChunkCenter)return;
+ lastChunkCenter=center;
+ for(let cx=ccx-CHUNK_RADIUS;cx<=ccx+CHUNK_RADIUS;cx++)for(let cz=ccz-CHUNK_RADIUS;cz<=ccz+CHUNK_RADIUS;cz++)generateChunk(cx,cz);
+ for(const [key,chunk] of [...loadedChunks.entries()]){
+  if(Math.abs(chunk.cx-ccx)<=CHUNK_RADIUS&&Math.abs(chunk.cz-ccz)<=CHUNK_RADIUS)continue;
+  worldGroup.remove(chunk.group);loadedChunks.delete(key);
+  blocks=blocks.filter(o=>o.userData.chunkKey!==key);worldObjects=worldObjects.filter(o=>o.userData.chunkKey!==key);
+  enemies=enemies.filter(o=>o.userData.chunkKey!==key);creatures=creatures.filter(o=>o.userData.chunkKey!==key);
+  interactables=interactables.filter(o=>o.userData?.chunkKey!==key);trees=trees.filter(o=>o.userData.chunkKey!==key);
+ }
+}
+function generateRealm(name){
+ state.realm=name;const d=getRealmDef(name);clearWorld();
+ scene.background=new THREE.Color(d.sky);scene.fog.color.setHex(d.fog);scene.fog.density=name==='Umbral Wilds'?.022:.012;
+ sun.color.setHex(name==='Cinderdeep'?0xff9c68:name==='Umbral Wilds'?0xc3b2ef:0xffe7bd);sun.intensity=name==='Cinderdeep'?1.6:2.5;
+ player.x=0;player.z=8;player.y=terrainHeight(0,8)+2;verticalVelocity=0;
+ updateChunks(player.x,player.z,true);
+ beacon=makeBeacon();portal=makePortal();dungeon=makeDungeon();
+ if(name==='Verdantia')makeNpc('Mira, the Rootkeeper',-11,-7,'The old paths are growing over. I remember the Heart Loom before the Sundering. Find the first Anchor Shard and I may remember more.',[{name:'Lost Seed Pouch',description:'Search a forgotten ruin for a seed pouch.'}]);
+ else makeNpc(name==='Cinderdeep'?'Korr the Emberwright':name==='Skyreach'?'Sella Cloudwalker':'Ilyr the Gloamkeeper',-11,-7,'The realm has changed since the Sundering. The guardian keeps an Anchor Shard. Prepare before you challenge it.',[{name:'A Realm Remembered',description:'Explore nearby ruins and return with a realm relic.'}]);
+ const bossDef={name:d.guardian,color:name==='Cinderdeep'?0xc94b32:name==='Skyreach'?0x7f9ea9:name==='Umbral Wilds'?0x5b4e76:0x566e3b,face:d.accent,hp:150,damage:16,speed:1.25};
+ boss=state.shards.includes(name)?null:addCreature(bossDef,12,-15,true,true,'boss-'+getRealmDef(name).id);
+ if(name==='Skyreach')for(let i=0;i<5;i++){const x=-15+i*7,z=-15+(i%2)*12;const island=new THREE.Mesh(new THREE.DodecahedronGeometry(2.6,0),material(0x8caaa6));island.position.set(x,13+hash(i,5,state.worldSeed)*4,z);island.scale.y=.45;island.castShadow=true;worldGroup.add(island);}
+ state.discovered=[...new Set([...state.discovered,name])];
+ camera.position.set(player.x,player.y+1.2,player.z);renderRealm();renderHotbar();renderStats();updateObjective();saveGame(false);
+}
 function renderRealm(){const d=getRealmDef(state.realm);$('#realm-name').textContent=state.realm.toUpperCase();$('#world-seed').textContent='WAYFARER 0.6';document.documentElement.style.setProperty('--realm-accent','#'+d.accent.toString(16).padStart(6,'0'));updateObjective();}
 function updateObjective(){const current=quests.find(q=>state.quests.includes(q.id)&&!state.completed.includes(q.id));$('#objective-title').textContent=current?current.name:'Explore the fourfold wilds';$('#objective-subtitle').textContent=current?current.desc:(state.shards.length===4?'Return to the Seed Beacon.':'Discover a ruin, tame a companion, or challenge a realm guardian.');}
 function renderHotbar(){const bar=$('#hotbar');bar.innerHTML='';state.hotbar.forEach((id,i)=>{const def=itemDef(id);const el=document.createElement('button');el.className='hotbar-slot'+(state.selected===i?' selected':'');el.innerHTML='<small>'+(i+1)+'</small><span>'+escapeHtml(def.icon)+'</span><em>'+(state.inventory[id]||0)+'</em>';el.title=def.name;el.addEventListener('click',()=>{state.selected=i;renderHotbar()});bar.appendChild(el)});}
@@ -109,7 +194,7 @@ function loadGame(){try{const s=JSON.parse(localStorage.getItem(STORAGE)||'null'
 function changeQuest(id){if(!state.completed.includes(id)){state.completed.push(id);state.quests=state.quests.filter(q=>q!==id);state.xp+=40;state.skillPoints+=1;toast('Quest completed: '+(quests.find(q=>q.id===id)?.name||id)+' · +40 XP');if(state.shards.length===4&&!state.completed.includes('loom')&&!state.quests.includes('loom'))state.quests.push('loom');updateObjective();saveGame(false);}}
 function checkQuestProgress(){if(state.quests.includes('first-tools')&&(state.inventory.pick||state.inventory.axe||state.inventory.blade))changeQuest('first-tools');if(state.quests.includes('first-gate')&&state.discovered.length>1)changeQuest('first-gate');if(state.quests.includes('anchor-1')&&state.shards.length>0)changeQuest('anchor-1');}
 function checkCommunityQuestProgress(){for(const q of contentOf('quests')){if(!state.communityCompleted)state.communityCompleted=[];if(q.requirement?.item&&q.requirement?.count&&(state.inventory[q.requirement.item]||0)>=q.requirement.count&&!state.communityCompleted.includes(q.id)){state.communityCompleted.push(q.id);for(const [id,n] of Object.entries(q.reward?.items||{}))addItem(id,n);state.xp+=(q.reward?.xp||20);toast('Community quest completed: '+q.name);}}}
-function startNew(){state.worldEdits={};state.finalBossDefeated=false;state.health=100;state.hunger=100;state.stamina=100;state.activeVehicle=null;state.activeDungeon={active:false,realm:'Verdantia'};state.inventory={wood:0,stone:0,fibre:0,berry:2,meat:1,ore:0,ember:0,cloudglass:0,lumen:0,wildseed:0,shard:0,cage:1};state.shards=[];state.tamed=[];state.quests=['awakening','first-tools','first-gate'];state.completed=[];state.realm='Verdantia';state.discovered=['Verdantia'];state.xp=0;state.skillPoints=0;state.level=1;state.glider=false;state.mount=null;player.x=0;player.z=8;generateRealm('Verdantia');enterGame();toast('A new Wayfarer wakes beneath the Seed Beacon.');}
+function startNew(){state.worldEdits={};state.finalBossDefeated=false;state.health=100;state.hunger=100;state.stamina=100;state.activeVehicle=null;state.activeDungeon={active:false,realm:'Verdantia'};state.inventory={wood:0,stone:0,fibre:0,berry:2,meat:1,ore:0,ember:0,cloudglass:0,lumen:0,wildseed:0,shard:0,cage:1};state.shards=[];state.tamed=[];state.quests=['awakening','first-tools','first-gate'];state.completed=[];state.realm='Verdantia';state.discovered=['Verdantia'];state.xp=0;state.skillPoints=0;state.level=1;state.glider=false;state.mount=null;player.x=0;player.z=8;state.worldSeed=Math.floor(Math.random()*900000)+100000;state.thirst=100;state.warmth=100;state.settlement={level:1,beaconCharge:100,structures:0};generateRealm('Verdantia');enterGame();toast('A new Wayfarer wakes beneath the Seed Beacon.');}
 function enterGame(){started=true;paused=false;$('#main-menu').classList.add('hidden');$('#hud').classList.remove('hidden');$('#game-topbar').classList.remove('hidden');$('#world-vignette').style.display='block';renderer.domElement.requestPointerLock?.();renderHotbar();renderStats();updateObjective();}
 function backToMenu(){saveGame(false);started=false;paused=false;document.exitPointerLock?.();$('#main-menu').classList.remove('hidden');$('#hud').classList.add('hidden');$('#game-topbar').classList.add('hidden');$('#pause-screen').classList.add('hidden');showPage('home');}
 function showPage(page){$$('.menu-page').forEach(p=>p.classList.toggle('active',p.dataset.panel===page));$$('.nav-button').forEach(b=>b.classList.toggle('selected',b.dataset.page===page));}
@@ -187,7 +272,7 @@ function updateCompanions(dt){for(const c of creatures){const u=c.userData;if(!u
 function respawn(){state.health=55;player.x=0;player.z=8;player.y=terrainHeight(0,8)+2;state.inventory.meat=Math.max(0,(state.inventory.meat||0)-1);toast('You were returned to the last Seed Beacon. One ration was lost.');renderStats();}
 function updateSurvival(dt){if(state.mode==='creative'){state.hunger=100;state.health=100;state.stamina=100;return;}hungerTimer+=dt;if(hungerTimer>13){hungerTimer=0;state.hunger=clamp(state.hunger-.8,0,100);if(state.hunger===0)state.health=clamp(state.health-.7,0,100);else if(state.hunger>65&&state.health<100)state.health=clamp(state.health+.2,0,100);renderStats();}if(keys.ShiftLeft&&state.stamina>0)state.stamina=clamp(state.stamina-24*dt,0,100);else state.stamina=clamp(state.stamina+15*dt,0,100);if(state.realm==='Cinderdeep'&&state.inventory.ember>0===false&&Math.sin(performance.now()*.0004)>.92)state.health=clamp(state.health-.12,0,100);if(state.realm==='Umbral Wilds'&&Math.sin(performance.now()*.00025)>.92)state.stamina=clamp(state.stamina-.1,0,100);renderStats();if(state.health<=0)respawn();}
 function updateDayNight(dt){dayTime+=dt*.004;const light=.65+Math.sin(dayTime)*.35;sun.intensity=state.realm==='Cinderdeep'?1.5:1.3+light*1.4;sun.position.set(Math.cos(dayTime)*40,30+Math.sin(dayTime)*35,Math.sin(dayTime)*30);}
-function animate(){requestAnimationFrame(animate);const now=performance.now(),dt=Math.min((now-lastTime)/1000,.04);lastTime=now;if(started&&!paused){const f=(keys.KeyW?1:0)-(keys.KeyS?1:0),s=(keys.KeyD?1:0)-(keys.KeyA?1:0);const run=keys.ShiftLeft&&state.stamina>2,speed=(player.speed||5.2)*(run?1.5:1);const dir=new THREE.Vector3(s,0,-f).normalize().applyAxisAngle(new THREE.Vector3(0,1,0),lookYaw);player.x+=dir.x*speed*dt;player.z+=dir.z*speed*dt;player.x=clamp(player.x,-23.5,23.5);player.z=clamp(player.z,-23.5,23.5);const ground=terrainHeight(Math.round(player.x),Math.round(player.z))+1.65;if(keys.Space&&player.grounded){verticalVelocity=7;player.grounded=false;}verticalVelocity-=19*dt;player.y+=verticalVelocity*dt;if(player.y<=ground){player.y=ground;verticalVelocity=0;player.grounded=true;}camera.position.set(player.x,player.y,player.z);if(vehicleRig){vehicleRig.position.set(player.x,player.y-.95,player.z);vehicleRig.rotation.y=lookYaw;}camera.rotation.set(lookPitch,lookYaw,0);player.attackCooldown=Math.max(0,player.attackCooldown-dt);updateEnemies(dt);updateCompanions(dt);updateSurvival(dt);updateDayNight(dt);updateInteractions();updateBossHud();}renderer.render(scene,camera);}
+function animate(){requestAnimationFrame(animate);const now=performance.now(),dt=Math.min((now-lastTime)/1000,.04);lastTime=now;if(started&&!paused){const f=(keys.KeyW?1:0)-(keys.KeyS?1:0),s=(keys.KeyD?1:0)-(keys.KeyA?1:0);const run=keys.ShiftLeft&&state.stamina>2,speed=(player.speed||5.2)*(run?1.5:1);const dir=new THREE.Vector3(s,0,-f).normalize().applyAxisAngle(new THREE.Vector3(0,1,0),lookYaw);player.x+=dir.x*speed*dt;player.z+=dir.z*speed*dt;player.x=clamp(player.x,-4096,4096);player.z=clamp(player.z,-4096,4096);updateChunks(player.x,player.z);const ground=terrainHeight(Math.round(player.x),Math.round(player.z))+1.65;if(keys.Space&&player.grounded){verticalVelocity=7;player.grounded=false;}verticalVelocity-=19*dt;player.y+=verticalVelocity*dt;if(player.y<=ground){player.y=ground;verticalVelocity=0;player.grounded=true;}camera.position.set(player.x,player.y,player.z);if(vehicleRig){vehicleRig.position.set(player.x,player.y-.95,player.z);vehicleRig.rotation.y=lookYaw;}camera.rotation.set(lookPitch,lookYaw,0);player.attackCooldown=Math.max(0,player.attackCooldown-dt);updateEnemies(dt);updateCompanions(dt);updateSurvival(dt);updateDayNight(dt);updateInteractions();updateBossHud();}renderer.render(scene,camera);}
 function changeRealm(name){state.realm=name;state.discovered=[...new Set([...state.discovered,name])];player.x=0;player.z=8;player.y=terrainHeight(0,8)+2;generateRealm(name);state.activeDungeon={active:false,realm:name};saveGame(false);if(state.quests.includes('first-gate')&&state.discovered.length>1)changeQuest('first-gate');}
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);}
 addEventListener('resize',resize);
