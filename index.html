@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1713">
 <meta name="description" content="FOURFOLD: WILDBOUND 0.6 — explore four realms, build your refuge, tame strange creatures, and expand your world with community content.">
-<title>FOURFOLD: WILDBOUND — 0.6</title>
+<title>FOURFOLD: WILDBOUND — 0.7</title>
 <link rel="stylesheet" href="./src/style.css">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
 </head>
@@ -31,11 +31,11 @@
         <button class="nav-button" data-page="chronicle"><span>☷</span> Chronicle</button>
         <button class="nav-button" data-page="settings"><span>⚙</span> Settings</button>
       </nav>
-      <div class="sidebar-bottom"><span class="status-pip"></span> OFFLINE WORLD · LOCAL SAVE <small>VERSION 0.6.0</small></div>
+      <div class="sidebar-bottom"><span class="status-pip"></span> OFFLINE WORLD · LOCAL SAVE <small>VERSION 0.7.0</small></div>
     </aside>
 
     <main class="menu-main">
-      <div class="menu-topline"><span>THE WORLD IS WIDER THAN YOU REMEMBER</span><span id="menu-date">WAYFARER ARCHIVE · 0.6</span></div>
+      <div class="menu-topline"><span>THE WORLD IS WIDER THAN YOU REMEMBER</span><span id="menu-date">THE LIVING WORLDS UPDATE · 0.7</span></div>
       <section class="menu-page active" data-panel="home">
         <div class="hero-copy"><span class="eyebrow">THE SUNDERING CHANGED EVERYTHING</span><h1>Four worlds.<br><i>One broken fate.</i></h1><p>The Heart Loom is silent. Its Anchor Shards lie scattered across the realms. Build a refuge, discover the wilds, and decide what should happen when the worlds are joined again.</p>
           <div class="hero-actions"><button id="continue-button" class="button-primary">ENTER THE WILDS <b>↗</b></button><button id="new-world-button" class="button-secondary">NEW EXPEDITION</button></div>
@@ -58,7 +58,7 @@
       </section>
       <section class="menu-page" data-panel="market">
         <div class="page-heading market-heading"><div><span class="eyebrow">COMMUNITY CONTENT EXCHANGE</span><h2>Expand your wilds.</h2><p>Install curated data packs. New creatures, dimensions, weapons, vehicles, quests and story expansions can join your world.</p></div><div class="import-actions"><button id="import-mod-button" class="button-secondary">＋ IMPORT FILE</button><button id="import-url-button" class="button-secondary">↗ IMPORT URL</button><a class="button-secondary submit-link" href="https://github.com/osejinduc-cyber/fourfold-wildbound/issues/new?title=Community%20pack%20submission&body=Share%20your%20JSON%20manifest%20link%20and%20a%20short%20description." target="_blank" rel="noopener">SUBMIT A CREATION ↗</a></div></div>
-        <div class="market-toolbar"><div class="search-wrap"><span>⌕</span><input id="market-search" placeholder="Search community creations…" autocomplete="off"></div><div id="market-filters" class="filter-row"><button class="filter-chip active" data-filter="all">All</button><button class="filter-chip" data-filter="creature">Creatures</button><button class="filter-chip" data-filter="dimension">Dimensions</button><button class="filter-chip" data-filter="weapon">Weapons</button><button class="filter-chip" data-filter="vehicle">Vehicles</button><button class="filter-chip" data-filter="quest">Quests</button><button class="filter-chip" data-filter="expansion">Expansions</button></div></div>
+        <div class="market-toolbar"><div class="search-wrap"><span>⌕</span><input id="market-search" placeholder="Search community creations…" autocomplete="off"></div><div id="market-filters" class="filter-row"><button class="filter-chip active" data-filter="all">All</button><button class="filter-chip" data-filter="creature">Creatures</button><button class="filter-chip" data-filter="dimension">Dimensions</button><button class="filter-chip" data-filter="weapon">Weapons</button><button class="filter-chip" data-filter="vehicle">Vehicles</button><button class="filter-chip" data-filter="quest">Quests</button><button class="filter-chip" data-filter="expansion">Expansions</button><button class="filter-chip" data-filter="settlement">Settlements</button><button class="filter-chip" data-filter="dungeon">Dungeons</button><button class="filter-chip" data-filter="survival">Survival</button></div></div>
         <div id="market-grid" class="market-grid"><div class="loading-card">Loading the community catalogue…</div></div>
         <div class="market-footnote">Packs are JSON data bundles. The game validates manifests and never executes code downloaded from the marketplace. Community creators can submit packs through GitHub.</div>
       </section>
@@ -74,16 +74,16 @@
         <div class="page-heading"><span class="eyebrow">EXPEDITION PREFERENCES</span><h2>Settings.</h2><p>Configure the local prototype to suit your machine and play style.</p></div>
         <div class="settings-grid"><label>Graphics quality<select id="quality-setting"><option value="high">High</option><option value="balanced" selected>Balanced</option><option value="performance">Performance</option></select></label><label>Field of view <output id="fov-output">78°</output><input id="fov-setting" type="range" min="60" max="100" value="78"></label><label>Mouse sensitivity <output id="sens-output">1.0×</output><input id="sens-setting" type="range" min="3" max="20" value="10"></label><label class="toggle-row">Reduced motion<input id="motion-setting" type="checkbox"></label><label class="toggle-row">Show control hints<input id="hints-setting" type="checkbox" checked></label></div>
       </section>
-      <footer class="menu-bottom"><span>FOURFOLD: WILDBOUND <b>0.6.0 · COMMUNITY BUILD</b></span><span>ORIGINAL WORLD · COMMUNITY-EXTENSIBLE</span></footer>
+      <footer class="menu-bottom"><span>FOURFOLD: WILDBOUND <b>0.7.0 · THE LIVING WORLDS UPDATE</b></span><span>ORIGINAL WORLD · COMMUNITY-EXTENSIBLE</span></footer>
     </main>
   </section>
 
   <section id="hud" class="hud hidden">
-    <div class="status-stack"><div class="status-line"><span>♥</span><div><i id="health-fill" class="health-fill"></i></div><b id="health-value">100</b></div><div class="status-line"><span>✦</span><div><i id="hunger-fill" class="hunger-fill"></i></div><b id="hunger-value">100</b></div><div class="status-line"><span>⌁</span><div><i id="stamina-fill" class="stamina-fill"></i></div><b id="stamina-value">100</b></div></div>
+    <div class="status-stack"><div class="status-line"><span>♥</span><div><i id="health-fill" class="health-fill"></i></div><b id="health-value">100</b></div><div class="status-line"><span>✦</span><div><i id="hunger-fill" class="hunger-fill"></i></div><b id="hunger-value">100</b></div><div class="status-line"><span>⌁</span><div><i id="stamina-fill" class="stamina-fill"></i></div><b id="stamina-value">100</b></div><div class="status-line"><span>◌</span><div><i id="thirst-fill" class="thirst-fill"></i></div><b id="thirst-value">100</b></div><div class="status-line"><span>❄</span><div><i id="warmth-fill" class="warmth-fill"></i></div><b id="warmth-value">100</b></div></div>
     <div class="hud-objective"><small>WAYFARER'S TASK</small><b id="objective-title">Awaken at the Seed Beacon</b><span id="objective-subtitle">Explore the first clearing.</span></div>
     <div id="boss-health" class="boss-health hidden"><small>REALM GUARDIAN</small><b id="boss-name">Guardian</b><div><i id="boss-fill"></i></div></div><div id="crosshair">＋</div><div id="interaction-prompt"></div>
     <div id="hotbar" class="hotbar"></div>
-    <div class="hud-hints" id="hud-hints">WASD move · Space jump · Shift sprint · Left-click mine / attack · Right-click build · E interact · F capture · J journal · F2 marketplace · Esc pause</div>
+    <div class="hud-hints" id="hud-hints">WASD move · Space jump · Shift sprint · Left-click mine / attack · Right-click build · E interact · F bond · Q command · P companion roles · B settlement · I inventory · K crafting · J journal · F2 marketplace · Esc pause</div>
     <div id="toast-stack" class="toast-stack"></div>
   </section>
 
