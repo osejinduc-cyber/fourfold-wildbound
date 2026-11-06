@@ -1,41 +1,98 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FOURFOLD: WILDBOUND</title>
-<style>
-:root{color-scheme:dark;font-family:Inter,system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:#07110f;color:#edf4e9;overflow:hidden}#world{position:fixed;inset:0}canvas{display:block}.veil{position:fixed;inset:0;background:linear-gradient(90deg,#07110fe8,transparent 65%),linear-gradient(0deg,#07110fbb,transparent 40%);pointer-events:none}.brand{position:fixed;left:5vw;top:7vh;max-width:580px}.eyebrow{letter-spacing:.28em;color:#b9d79c;font-size:11px;font-weight:700}.brand h1{font-size:clamp(38px,6vw,76px);line-height:.94;letter-spacing:-.055em;margin:14px 0}.brand p{color:#c1d0bf;line-height:1.6;max-width:480px}.panel{position:fixed;left:5vw;bottom:7vh;display:flex;gap:10px;flex-wrap:wrap;pointer-events:auto}.panel button{border:1px solid #b6d39b66;background:#14251fe8;color:#f1f7e9;padding:13px 18px;border-radius:5px;font-weight:700;cursor:pointer}.panel button.primary{background:#b5d18f;color:#132019;border:0}.panel button:hover{filter:brightness(1.15)}#hud{display:none;position:fixed;inset:0;pointer-events:none}.top{position:absolute;top:20px;left:22px;background:#0a1713c9;border:1px solid #b8d49a55;padding:12px 16px;border-radius:6px}.bottom{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:#0a1713d9;padding:10px 18px;border:1px solid #b8d49a55;border-radius:6px;white-space:nowrap}.cross{position:absolute;left:50%;top:50%;font-size:22px;transform:translate(-50%,-50%);color:#fff}.toast{position:absolute;top:22px;right:22px;background:#10251d;padding:12px 16px;border-radius:5px;max-width:280px}.help{position:absolute;bottom:20px;right:22px;color:#d4e1cf;background:#0a1713b8;padding:12px;border-radius:5px;font-size:12px;line-height:1.7}#pause{display:none;position:fixed;inset:0;background:#06100edb;place-items:center}.card{background:#102019;border:1px solid #b5d18f66;padding:30px;max-width:420px;border-radius:8px}.card h2{margin-top:0}.card button{padding:11px 16px;background:#b5d18f;border:0;border-radius:4px;font-weight:700;cursor:pointer}
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1713">
+<meta name="description" content="FOURFOLD: WILDBOUND 0.6 — explore four realms, build your refuge, tame strange creatures, and expand your world with community content.">
+<title>FOURFOLD: WILDBOUND — 0.6</title>
+<link rel="stylesheet" href="./src/style.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
 </head>
 <body>
-<div id="world"></div><div class="veil" id="veil"></div>
-<section class="brand" id="menu"><div class="eyebrow">A FOUR-REALM SURVIVAL ADVENTURE</div><h1>FOURFOLD:<br>WILDBOUND</h1><p>The Heart Loom is broken. Four dimensions drift apart. Awaken as a Wayfarer, explore the wilds, build a refuge, and recover the Anchor Shards before the Pale Cartographer redraws reality.</p><p><b>Verdantia</b> · <b>Cinderdeep</b> · <b>Skyreach</b> · <b>Umbral Wilds</b></p></section>
-<div class="panel" id="buttons"><button class="primary" id="start">ENTER THE WILDS</button><button id="story">THE CHRONICLE</button><button id="controls">CONTROLS</button></div>
-<div id="hud"><div class="top"><b>VERDANTIA</b><br><span id="stats">Health 100 · Wood 0 · Stone 0</span></div><div class="cross">＋</div><div class="bottom">WASD Move · Space Jump · Shift Sprint · Click Mine · Right-click Place · E Interact · Esc Pause</div><div class="help">Gather wood and stone.<br>Build a small shelter.<br>Explore the ancient beacon.</div></div>
-<div id="pause"><div class="card"><h2>Journey paused</h2><p>The wilds will wait for you.</p><button id="resume">Resume expedition</button></div></div>
-<script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-const root=document.querySelector('#world');const scene=new THREE.Scene();scene.background=new THREE.Color('#9bb8ae');scene.fog=new THREE.FogExp2('#9bb8ae',.012);
-const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,.1,500);camera.position.set(0,3,9);
-const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;root.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight('#d9f3df','#344238',2));const sun=new THREE.DirectionalLight('#fff0d1',3);sun.position.set(-35,60,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
-const mat=(c)=>new THREE.MeshStandardMaterial({color:c,roughness:.88});const grass=mat('#64834d'),dirt=mat('#76583e'),stone=mat('#858d82'),wood=mat('#735039'),leaf=mat('#345c3d');
-const blocks=[];function block(x,y,z,m){const mesh=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),m);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;scene.add(mesh);blocks.push(mesh);return mesh}
-for(let x=-22;x<=22;x++)for(let z=-22;z<=22;z++){let h=Math.floor(1+Math.sin(x*.28)*1.1+Math.cos(z*.24)*.8);for(let y=0;y<h;y++)block(x,y,z,y===h-1?grass:dirt)}
-for(let i=0;i<32;i++){let x=Math.floor(Math.random()*40-20),z=Math.floor(Math.random()*40-20);if(Math.abs(x)<4&&Math.abs(z)<4)continue;let h=3+Math.floor(Math.random()*3);for(let y=1;y<h;y++)block(x,y,z,wood);for(let dx=-2;dx<=2;dx++)for(let dz=-2;dz<=2;dz++)for(let dy=0;dy<3;dy++)if(Math.abs(dx)+Math.abs(dz)+dy<5)block(x+dx,h+dy,z+dz,leaf)}
-for(let i=0;i<50;i++){let x=Math.floor(Math.random()*38-19),z=Math.floor(Math.random()*38-19);block(x,3,z,stone)}
-const water=new THREE.Mesh(new THREE.PlaneGeometry(80,80),new THREE.MeshStandardMaterial({color:'#4b8e91',transparent:true,opacity:.55,roughness:.18,metalness:.2}));water.rotation.x=-Math.PI/2;water.position.set(0,.55,-28);scene.add(water);
-const beacon=new THREE.Group();const base=new THREE.Mesh(new THREE.CylinderGeometry(2,2.5,1,8),stone);base.position.y=1;beacon.add(base);const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(1.2),new THREE.MeshStandardMaterial({color:'#b8e5c7',emissive:'#4b9d79',emissiveIntensity:2,roughness:.2}));crystal.position.y=3;beacon.add(crystal);beacon.position.set(0,0,-5);scene.add(beacon);
-const ray=new THREE.Raycaster();const center=new THREE.Vector2(0,0);let active=false,paused=false,yaw=0,pitch=0,health=100,woodCount=0,stoneCount=0,vy=0;const keys={};const player={x:0,y:3,z:8};const stats=document.querySelector('#stats');
-function updateStats(){stats.textContent=`Health ${health} · Wood ${woodCount} · Stone ${stoneCount}`}
-function begin(){document.querySelector('#menu').style.display='none';document.querySelector('#buttons').style.display='none';document.querySelector('#veil').style.display='none';document.querySelector('#hud').style.display='block';active=true;renderer.domElement.requestPointerLock()}
-document.querySelector('#start').onclick=begin;document.querySelector('#resume').onclick=()=>{paused=false;document.querySelector('#pause').style.display='none';renderer.domElement.requestPointerLock()};document.querySelector('#story').onclick=()=>alert('The Heart Loom once bound four dimensions. The Sundering shattered it into four Anchor Shards. You are a Wayfarer. Recover the shards, uncover the Pale Cartographer’s crime, and choose the fate of the worlds.');document.querySelector('#controls').onclick=()=>alert('WASD move · Mouse look · Space jump · Shift sprint · Left click mine/attack · Right click place · E interact · Esc pause');
-document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement!==renderer.domElement&&active&&!paused){paused=true;document.querySelector('#pause').style.display='grid'}});
-document.addEventListener('mousemove',e=>{if(document.pointerLockElement===renderer.domElement){yaw-=e.movementX*.002;pitch=Math.max(-1.3,Math.min(1.3,pitch-e.movementY*.002))}});
-addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Escape'&&active){paused=true;document.exitPointerLock();document.querySelector('#pause').style.display='grid'}if(e.code==='Space'&&Math.abs(player.y-2)<.15)vy=8;if(e.code==='KeyE'&&player.x*player.x+(player.z+5)**2<16)alert('The Seed Beacon stirs. Four dormant portals await their Anchor Shards.')});
-addEventListener('keyup',e=>keys[e.code]=false);
-document.addEventListener('contextmenu',e=>e.preventDefault());
-document.addEventListener('mousedown',e=>{if(!active||paused||!document.pointerLockElement)return;ray.setFromCamera(center,camera);const hit=ray.intersectObjects(blocks,false)[0];if(e.button===0&&hit){const b=hit.object;scene.remove(b);blocks.splice(blocks.indexOf(b),1);if(b.material===wood)woodCount++;else if(b.material===stone)stoneCount++;updateStats()}if(e.button===2&&hit){const p=hit.point.clone().add(hit.face.normal.multiplyScalar(.51));const b=block(Math.round(p.x),Math.round(p.y),Math.round(p.z),wood);woodCount=Math.max(0,woodCount-1);updateStats()}});
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);if(active&&!paused){let f=(keys.KeyW?1:0)-(keys.KeyS?1:0),s=(keys.KeyD?1:0)-(keys.KeyA?1:0),speed=keys.ShiftLeft?9:5;let dir=new THREE.Vector3(s,0,-f).normalize().applyAxisAngle(new THREE.Vector3(0,1,0),yaw);player.x+=dir.x*speed*dt;player.z+=dir.z*speed*dt;vy-=20*dt;player.y+=vy*dt;if(player.y<2){player.y=2;vy=0}camera.position.set(player.x,player.y,player.z);camera.rotation.order='YXZ';camera.rotation.set(pitch,yaw,0);crystal.rotation.y+=dt*.7;crystal.position.y=3+Math.sin(performance.now()*.001)*.18}renderer.render(scene,camera)}
-const clock=new THREE.Clock();animate();addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-</script></body></html>
+<div id="game">
+  <div id="world" aria-label="3D game world"></div>
+  <div id="world-vignette"></div>
+  <header id="game-topbar" class="game-topbar hidden">
+    <div class="realm-chip"><span class="realm-dot"></span><span id="realm-name">VERDANTIA</span><small id="world-seed">WORLD 01</small></div>
+    <div class="topbar-right"><button id="quick-journal" class="icon-button" title="Journal (J)">☷</button><button id="quick-market" class="icon-button" title="Mod Marketplace (F2)">⬡</button><button id="pause-button" class="icon-button" title="Pause (Esc)">Ⅱ</button></div>
+  </header>
+
+  <section id="main-menu" class="screen">
+    <div class="menu-bg-glow"></div>
+    <aside class="sidebar">
+      <div class="brand"><div class="brand-mark"><i></i><i></i><i></i><i></i></div><div><strong>FOURFOLD</strong><small>WILDBOUND</small></div></div>
+      <div class="sidebar-label">WAYFARER'S ATLAS</div>
+      <nav class="side-nav">
+        <button class="nav-button selected" data-page="home"><span>⌂</span> Home</button>
+        <button class="nav-button" data-page="realms"><span>✧</span> Realms <em>4</em></button>
+        <button class="nav-button" data-page="market"><span>⬡</span> Mod Marketplace <em class="nav-count" id="market-count">6</em></button>
+        <button class="nav-button" data-page="library"><span>▣</span> My Mods <em id="installed-count">0</em></button>
+        <button class="nav-button" data-page="chronicle"><span>☷</span> Chronicle</button>
+        <button class="nav-button" data-page="settings"><span>⚙</span> Settings</button>
+      </nav>
+      <div class="sidebar-bottom"><span class="status-pip"></span> OFFLINE WORLD · LOCAL SAVE <small>VERSION 0.6.0</small></div>
+    </aside>
+
+    <main class="menu-main">
+      <div class="menu-topline"><span>THE WORLD IS WIDER THAN YOU REMEMBER</span><span id="menu-date">WAYFARER ARCHIVE · 0.6</span></div>
+      <section class="menu-page active" data-panel="home">
+        <div class="hero-copy"><span class="eyebrow">THE SUNDERING CHANGED EVERYTHING</span><h1>Four worlds.<br><i>One broken fate.</i></h1><p>The Heart Loom is silent. Its Anchor Shards lie scattered across the realms. Build a refuge, discover the wilds, and decide what should happen when the worlds are joined again.</p>
+          <div class="hero-actions"><button id="continue-button" class="button-primary">ENTER THE WILDS <b>↗</b></button><button id="new-world-button" class="button-secondary">NEW EXPEDITION</button></div>
+        </div>
+        <div class="home-cards">
+          <article class="feature-card realm-card verdantia"><div class="card-meta">01 / THE FIRST REALM</div><div><h3>Verdantia</h3><p>Where the roots remember.</p></div></article>
+          <article class="feature-card loom-card"><div class="card-meta">YOUR PURPOSE</div><div><h3>Restore the<br>Heart Loom</h3><p>Four Anchor Shards. Four guardians.</p></div></article>
+          <article class="feature-card mod-card"><div class="card-meta">COMMUNITY CREATIONS</div><div><h3>Make the wilds<br>your own.</h3><p>New creatures, realms, gear and stories.</p><button class="text-link" data-goto="market">EXPLORE THE MARKETPLACE →</button></div></article>
+        </div>
+        <div class="home-footer"><span>LAST EXPEDITION <b id="last-save-label">No expedition saved</b></span><span>LOCAL WORLDS <b>1 PLAYER</b></span><span>COMMUNITY CONTENT <b>DATA PACKS</b></span></div>
+      </section>
+      <section class="menu-page" data-panel="realms">
+        <div class="page-heading"><span class="eyebrow">THE FOURFOLD ATLAS</span><h2>Choose your horizon.</h2><p>Each realm generates its own terrain, resources, hazards and guardian. Discover a realm gate to travel between worlds.</p></div>
+        <div class="realm-grid">
+          <button class="realm-tile verdantia" data-realm="Verdantia"><span>01 · VERDANTIA</span><b>The Rootbound</b><small>Forests · Rivers · Ruins</small></button>
+          <button class="realm-tile cinderdeep" data-realm="Cinderdeep"><span>02 · CINDERDEEP</span><b>The Ember Below</b><small>Basalt · Ash · Magma</small></button>
+          <button class="realm-tile skyreach" data-realm="Skyreach"><span>03 · SKYREACH</span><b>The Broken Firmament</b><small>Floating Isles · Storms</small></button>
+          <button class="realm-tile umbral" data-realm="Umbral Wilds"><span>04 · UMBRAL WILDS</span><b>The Shrouded Reach</b><small>Glowgroves · Mist · Relics</small></button>
+        </div>
+      </section>
+      <section class="menu-page" data-panel="market">
+        <div class="page-heading market-heading"><div><span class="eyebrow">COMMUNITY CONTENT EXCHANGE</span><h2>Expand your wilds.</h2><p>Install curated data packs. New creatures, dimensions, weapons, vehicles, quests and story expansions can join your world.</p></div><button id="import-mod-button" class="button-secondary">＋ IMPORT PACK</button></div>
+        <div class="market-toolbar"><div class="search-wrap"><span>⌕</span><input id="market-search" placeholder="Search community creations…" autocomplete="off"></div><div id="market-filters" class="filter-row"><button class="filter-chip active" data-filter="all">All</button><button class="filter-chip" data-filter="creature">Creatures</button><button class="filter-chip" data-filter="dimension">Dimensions</button><button class="filter-chip" data-filter="weapon">Weapons</button><button class="filter-chip" data-filter="vehicle">Vehicles</button><button class="filter-chip" data-filter="quest">Quests</button><button class="filter-chip" data-filter="expansion">Expansions</button></div></div>
+        <div id="market-grid" class="market-grid"><div class="loading-card">Loading the community catalogue…</div></div>
+        <div class="market-footnote">Packs are JSON data bundles. The game validates manifests and never executes code downloaded from the marketplace.</div>
+      </section>
+      <section class="menu-page" data-panel="library">
+        <div class="page-heading"><span class="eyebrow">YOUR COLLECTION</span><h2>My installed mods.</h2><p>Manage the content packs available to your local world. Disable a pack without deleting it.</p></div>
+        <div id="library-list" class="library-list"><div class="empty-state">No community packs installed yet. Visit the Marketplace to expand your expedition.</div></div>
+      </section>
+      <section class="menu-page" data-panel="chronicle">
+        <div class="page-heading"><span class="eyebrow">THE WAYFARER CHRONICLE</span><h2>The Heart Loom.</h2><p>An ancient engine once held the four dimensions in harmony. Then came the Sundering.</p></div>
+        <div class="chronicle-grid"><article><span>THE BEGINNING</span><h3>The Loom Before Time</h3><p>Four currents flowed through the Heart Loom, binding Verdantia, Cinderdeep, Skyreach and the Umbral Wilds. Roads, rivers and roots could cross between dimensions.</p></article><article><span>THE CATASTROPHE</span><h3>The Sundering</h3><p>A pulse tore through the Loom. Four Anchor Shards were cast into distant realms. The worlds drifted apart, and the old gates fell silent.</p></article><article><span>THE WAYFARER</span><h3>A Choice Unwritten</h3><p>You awaken beneath a Seed Beacon. Find the shards, learn who caused the Sundering, and decide whether the worlds should be restored—or changed forever.</p></article></div>
+      </section>
+      <section class="menu-page" data-panel="settings">
+        <div class="page-heading"><span class="eyebrow">EXPEDITION PREFERENCES</span><h2>Settings.</h2><p>Configure the local prototype to suit your machine and play style.</p></div>
+        <div class="settings-grid"><label>Graphics quality<select id="quality-setting"><option value="high">High</option><option value="balanced" selected>Balanced</option><option value="performance">Performance</option></select></label><label>Field of view <output id="fov-output">78°</output><input id="fov-setting" type="range" min="60" max="100" value="78"></label><label>Mouse sensitivity <output id="sens-output">1.0×</output><input id="sens-setting" type="range" min="3" max="20" value="10"></label><label class="toggle-row">Reduced motion<input id="motion-setting" type="checkbox"></label><label class="toggle-row">Show control hints<input id="hints-setting" type="checkbox" checked></label></div>
+      </section>
+      <footer class="menu-bottom"><span>FOURFOLD: WILDBOUND <b>0.6.0 · COMMUNITY BUILD</b></span><span>ORIGINAL WORLD · COMMUNITY-EXTENSIBLE</span></footer>
+    </main>
+  </section>
+
+  <section id="hud" class="hud hidden">
+    <div class="status-stack"><div class="status-line"><span>♥</span><div><i id="health-fill" class="health-fill"></i></div><b id="health-value">100</b></div><div class="status-line"><span>✦</span><div><i id="hunger-fill" class="hunger-fill"></i></div><b id="hunger-value">100</b></div><div class="status-line"><span>⌁</span><div><i id="stamina-fill" class="stamina-fill"></i></div><b id="stamina-value">100</b></div></div>
+    <div class="hud-objective"><small>WAYFARER'S TASK</small><b id="objective-title">Awaken at the Seed Beacon</b><span id="objective-subtitle">Explore the first clearing.</span></div>
+    <div id="crosshair">＋</div><div id="interaction-prompt"></div>
+    <div id="hotbar" class="hotbar"></div>
+    <div class="hud-hints" id="hud-hints">WASD move · Space jump · Shift sprint · Left-click mine / attack · Right-click build · E interact · F capture · J journal · F2 marketplace · Esc pause</div>
+    <div id="toast-stack" class="toast-stack"></div>
+  </section>
+
+  <section id="game-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" data-close-modal></div><div class="modal-panel"><button class="modal-close" data-close-modal aria-label="Close">×</button><div id="modal-content"></div></div>
+  </section>
+  <section id="pause-screen" class="pause-screen hidden"><div class="pause-panel"><span class="eyebrow">WAYFARER'S REST</span><h2>Journey paused.</h2><button id="resume-button" class="button-primary">RESUME EXPEDITION</button><button id="pause-journal" class="button-secondary">OPEN CHRONICLE</button><button id="pause-market" class="button-secondary">MOD MARKETPLACE</button><button id="save-exit-button" class="button-secondary">SAVE & RETURN TO MENU</button></div></section>
+  <input id="pack-file-input" type="file" accept=".json,application/json" hidden>
+</div>
+<script type="module" src="./src/game.js"></script>
+</body>
+</html>
