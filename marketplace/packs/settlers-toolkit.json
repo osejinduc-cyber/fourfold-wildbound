@@ -1,0 +1,83 @@
+{
+  "id": "settlers-toolkit",
+  "name": "Settler's Toolkit",
+  "version": "1.0.0",
+  "author": "Fourfold Community",
+  "icon": "🏡",
+  "description": "Dress your growing refuge with crafted hearthwood pieces and luminous waymarkers, plus a local building supply quest.",
+  "tags": [
+    "settlement",
+    "building",
+    "decor"
+  ],
+  "content": {
+    "items": [
+      {
+        "id": "hearthwood-beam",
+        "name": "Hearthwood Beam",
+        "icon": "🪵",
+        "type": "block",
+        "placeable": true,
+        "color": 8671795
+      },
+      {
+        "id": "beacon-lantern",
+        "name": "Beacon Lantern",
+        "icon": "🏮",
+        "type": "block",
+        "placeable": true,
+        "color": 13476154
+      }
+    ],
+    "recipes": [
+      {
+        "id": "hearthwood-beam-recipe",
+        "label": "Hearthwood Beam ×4",
+        "desc": "Warm timber for a settlement's outer walkways.",
+        "cost": {
+          "wood": 5,
+          "fibre": 2
+        },
+        "out": {
+          "hearthwood-beam": 4
+        }
+      },
+      {
+        "id": "beacon-lantern-recipe",
+        "label": "Beacon Lantern",
+        "desc": "A glowing marker for paths around the Seed Beacon.",
+        "cost": {
+          "wood": 3,
+          "cloudglass": 2,
+          "lumen": 1
+        },
+        "out": {
+          "beacon-lantern": 1
+        }
+      }
+    ],
+    "quests": [
+      {
+        "id": "settlement-stores",
+        "name": "Stock the Settlement Stores",
+        "description": "Gather 12 Heartwood to prepare for the next building project.",
+        "requirement": {
+          "item": "wood",
+          "count": 12
+        },
+        "reward": {
+          "xp": 75,
+          "items": {
+            "hearthwood-beam": 2
+          }
+        }
+      }
+    ],
+    "lore": [
+      {
+        "title": "A Place to Return To",
+        "text": "A settlement is more than walls. It is the promise that the road will lead home."
+      }
+    ]
+  }
+}
