@@ -1,0 +1,106 @@
+{
+  "id": "wilds-survival-provisions",
+  "name": "Wilds Survival Provisions",
+  "version": "1.0.0",
+  "author": "Fourfold Community",
+  "icon": "🧭",
+  "description": "Add expedition food and drink recipes that help manage hunger, thirst and warmth on longer journeys.",
+  "tags": [
+    "survival",
+    "cooking",
+    "supplies"
+  ],
+  "content": {
+    "items": [
+      {
+        "id": "springwater-flask",
+        "name": "Springwater Flask",
+        "icon": "💧",
+        "type": "food",
+        "thirst": 72,
+        "hunger": 2
+      },
+      {
+        "id": "smoked-root-stew",
+        "name": "Smoked Root Stew",
+        "icon": "🍲",
+        "type": "food",
+        "heal": 12,
+        "hunger": 55,
+        "warmth": 22
+      },
+      {
+        "id": "cooling-berry-tonic",
+        "name": "Cooling Berry Tonic",
+        "icon": "🧃",
+        "type": "food",
+        "thirst": 36,
+        "heal": 5,
+        "warmth": -8
+      }
+    ],
+    "recipes": [
+      {
+        "id": "springwater-flask-recipe",
+        "label": "Springwater Flask",
+        "desc": "Pack clean water for a long expedition.",
+        "cost": {
+          "fibre": 3,
+          "wood": 2,
+          "berry": 1
+        },
+        "out": {
+          "springwater-flask": 1
+        }
+      },
+      {
+        "id": "smoked-root-stew-recipe",
+        "label": "Smoked Root Stew",
+        "desc": "A filling meal that helps restore warmth.",
+        "cost": {
+          "meat": 1,
+          "berry": 3,
+          "wood": 1
+        },
+        "out": {
+          "smoked-root-stew": 1
+        }
+      },
+      {
+        "id": "cooling-berry-tonic-recipe",
+        "label": "Cooling Berry Tonic",
+        "desc": "A refreshing drink for hot realm crossings.",
+        "cost": {
+          "berry": 4,
+          "fibre": 1
+        },
+        "out": {
+          "cooling-berry-tonic": 1
+        }
+      }
+    ],
+    "quests": [
+      {
+        "id": "provision-the-wayfarer",
+        "name": "Provision the Wayfarer",
+        "description": "Gather 8 Sunberries for a proper expedition pantry.",
+        "requirement": {
+          "item": "berry",
+          "count": 8
+        },
+        "reward": {
+          "xp": 85,
+          "items": {
+            "springwater-flask": 2
+          }
+        }
+      }
+    ],
+    "lore": [
+      {
+        "title": "The Long Road Recipe Book",
+        "text": "A good pack holds something sweet for the cold, something cool for the heat, and enough water to make it to the next beacon."
+      }
+    ]
+  }
+}
