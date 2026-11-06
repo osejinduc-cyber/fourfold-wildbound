@@ -1,0 +1,59 @@
+{
+  "id": "astral-armory",
+  "name": "Astral Armory",
+  "version": "1.0.0",
+  "author": "Fourfold Community",
+  "icon": "⚔️",
+  "description": "A pair of dimension-forged weapons for high-risk expeditions: the Starfall Glaive and Riftglass Saber.",
+  "tags": [
+    "weapons",
+    "combat",
+    "crafting"
+  ],
+  "content": {
+    "weapons": [
+      {
+        "id": "starfall-glaive",
+        "name": "Starfall Glaive",
+        "icon": "🗡️",
+        "damage": 28,
+        "description": "A heavy crescent blade that hits with a falling-star impact."
+      },
+      {
+        "id": "riftglass-saber",
+        "name": "Riftglass Saber",
+        "icon": "⚔️",
+        "damage": 23,
+        "description": "A quick crystalline edge tuned to unstable portals."
+      }
+    ],
+    "recipes": [
+      {
+        "id": "craft-starfall-glaive",
+        "label": "Starfall Glaive",
+        "desc": "A heavy astral weapon.",
+        "cost": {
+          "cloudglass": 3,
+          "ore": 4,
+          "lumen": 2
+        },
+        "out": {
+          "starfall-glaive": 1
+        }
+      },
+      {
+        "id": "craft-riftglass-saber",
+        "label": "Riftglass Saber",
+        "desc": "A swift dimension blade.",
+        "cost": {
+          "lumen": 3,
+          "ore": 2,
+          "fibre": 2
+        },
+        "out": {
+          "riftglass-saber": 1
+        }
+      }
+    ]
+  }
+}
