@@ -1,0 +1,83 @@
+{
+  "id": "deepvault-expeditions",
+  "name": "Deepvault Expeditions",
+  "version": "1.0.0",
+  "author": "Fourfold Community",
+  "icon": "🗝️",
+  "description": "Take on a harder relic-hunting side story and craft two weapons designed for dangerous vault runs.",
+  "tags": [
+    "dungeon",
+    "relics",
+    "weapons"
+  ],
+  "content": {
+    "weapons": [
+      {
+        "id": "vaultbreaker-maul",
+        "name": "Vaultbreaker Maul",
+        "icon": "🔨",
+        "damage": 24,
+        "description": "A slow, heavy weapon for armoured vault sentinels."
+      },
+      {
+        "id": "echo-pike",
+        "name": "Echo Pike",
+        "icon": "🔱",
+        "damage": 20,
+        "description": "A balanced reach weapon forged around a resonant shard."
+      }
+    ],
+    "recipes": [
+      {
+        "id": "vaultbreaker-maul-recipe",
+        "label": "Vaultbreaker Maul",
+        "desc": "Forge a heavy weapon for close-quarters vault combat.",
+        "cost": {
+          "wood": 8,
+          "ore": 8,
+          "lumen": 2
+        },
+        "out": {
+          "vaultbreaker-maul": 1
+        }
+      },
+      {
+        "id": "echo-pike-recipe",
+        "label": "Echo Pike",
+        "desc": "A long-handled weapon tuned to the vault's old seals.",
+        "cost": {
+          "wood": 6,
+          "cloudglass": 5,
+          "lumen": 3
+        },
+        "out": {
+          "echo-pike": 1
+        }
+      }
+    ],
+    "quests": [
+      {
+        "id": "reliquary-hunt",
+        "name": "The Reliquary Hunt",
+        "description": "Recover 6 Lumen Shards to trace the hidden reliquary route.",
+        "requirement": {
+          "item": "lumen",
+          "count": 6
+        },
+        "reward": {
+          "xp": 180,
+          "items": {
+            "tonic": 2,
+            "ore": 4
+          }
+        }
+      }
+    ],
+    "lore": [
+      {
+        "title": "The Deepvault Oath",
+        "text": "The old vault wardens were not paid to keep treasure in. They were sworn to keep something else from getting out."
+      }
+    ]
+  }
+}
