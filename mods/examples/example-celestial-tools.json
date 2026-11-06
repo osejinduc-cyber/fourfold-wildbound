@@ -1,0 +1,38 @@
+{
+  "id": "celestial_tools_example",
+  "name": "Celestial Tools Example",
+  "version": "1.0.0",
+  "author": "Fourfold Modding Guide",
+  "icon": "🌙",
+  "description": "Example pack adding a Moonstone and a simple recipe.",
+  "items": [
+    {
+      "id": "moonstone",
+      "name": "Moonstone",
+      "icon": "🌙",
+      "placeable": true,
+      "color": "#8b80a8",
+      "emissive": "#5d4b94"
+    }
+  ],
+  "recipes": [
+    {
+      "id": "moonstone_polish",
+      "name": "Polished Moonstone",
+      "desc": "A cool stone polished to a soft glow.",
+      "cost": {
+        "crystal": 2,
+        "stone": 1
+      },
+      "out": {
+        "moonstone": 1
+      }
+    }
+  ],
+  "lore": [
+    {
+      "title": "Moonstone",
+      "text": "This example demonstrates safe item, recipe and lore registration."
+    }
+  ]
+}
