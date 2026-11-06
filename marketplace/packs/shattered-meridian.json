@@ -1,0 +1,34 @@
+{
+  "id": "shattered-meridian",
+  "name": "Shattered Meridian",
+  "version": "1.0.0",
+  "author": "Fourfold Community",
+  "icon": "🌌",
+  "description": "A fifth, community-made realm of fractured crystal shelves and drifting monoliths. Explore its luminous ravines and challenge the Meridian Sentinel.",
+  "tags": [
+    "dimension",
+    "exploration",
+    "boss"
+  ],
+  "content": {
+    "dimensions": [
+      {
+        "id": "shattered-meridian",
+        "name": "Shattered Meridian",
+        "description": "Fractured crystal shelves, floating monoliths and silent meridian storms.",
+        "sky": 2440282,
+        "fog": 5401738,
+        "ground": 4610928,
+        "top": 10204873,
+        "soil": 3425883,
+        "rock": 8228775,
+        "water": 4688549,
+        "accent": 9165294,
+        "hazard": "Rift Surge",
+        "resource": "Meridian Glass",
+        "guardian": "Meridian Sentinel",
+        "icon": "🌌"
+      }
+    ]
+  }
+}
