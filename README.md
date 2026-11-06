@@ -13,7 +13,7 @@ Open **http://localhost:8000**. A network connection is needed to load Three.js 
 
 ## Publish on GitHub Pages
 1. Open repository **Settings → Pages**.
-2. Select **GitHub Actions** as the deployment source.
+2. If Pages has not been enabled yet, choose **GitHub Actions** as the build and deployment source and save it. The workflow can deploy after this one-time setup.
 3. Push to `main` or manually run the workflow under **Actions → Deploy FOURFOLD to GitHub Pages**.
 4. Open the Pages URL shown by the successful workflow.
 
