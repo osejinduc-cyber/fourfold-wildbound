@@ -114,7 +114,7 @@ jobs:
           (root / "LAUNCH-MAC-LINUX.sh").write_text(sh, encoding="utf-8")
           PY
           chmod +x "$DIST/LAUNCH-MAC-LINUX.sh"
-          zip -qr dist/FOURFOLD-WILDBOUND-0.7-OFFLINE.zip "$DIST"
+          (cd dist && zip -qr FOURFOLD-WILDBOUND-0.7-OFFLINE.zip fourfold-wildbound-0.7-offline)
       - name: Upload offline package
         uses: actions/upload-artifact@v4
         with:
