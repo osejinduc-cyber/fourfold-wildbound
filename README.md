@@ -48,7 +48,9 @@ Each realm is built from deterministic 16×16 terrain chunks. Seven-by-seven chu
 - Creature behaviours now include patrol, pursuit, group alerting, retreat and passive wildlife fleeing/foraging. Bonded companions can Follow, Guard or Forage.
 - Forgotten Vaults use three escalating combat depths, an elite Custodian and repeat-run difficulty/reward records.
 - Verdantia can grow into a settlement: build homesteads, farms, workshops and watchtowers; increase its level, population and reputation; farms produce food while the player explores.
-- Hotbar, inventory, selectable items, recipes and field crafting.
+- Hotbar, inventory, selectable items, and a redesigned workbench with recipe categories, text search, ingredient ownership checks, and one-at-a-time or ×5 batch crafting.
+- New first-person low-poly sleeve, hand and held-item models that update from the selected hotbar slot.
+- A dedicated build mode with a snapped ghost preview, occupied-space feedback, 90-degree rotation, and a build catalogue. Craft floors, beams, stairs, fences, doors, glass panes, roof tiles, path stones and lanterns.
 - Craftable mining tools, axe, blade, healing tonic, Resonance Cage, timber/stone blocks and a raft recipe.
 - Capture creatures with **F**, command bonded companions with **Q**, and mount a bonded mountable creature with **R**.
 - Community vehicles can be crafted and ridden for faster traversal; a simple visible vehicle rig follows the player.
@@ -68,6 +70,9 @@ Each realm is built from deterministic 16×16 terrain chunks. Seven-by-seven chu
 | Shift | Sprint |
 | Left click | Mine / attack |
 | Right click | Place selected building block |
+| G | Toggle snapped build mode |
+| Z | Rotate the build preview by 90° |
+| H | Open the building-piece catalogue |
 | 1–8 | Select hotbar slot |
 | E | Interact with nearby beacon, gate, NPC, tree or vault |
 | F | Attempt to bond with a nearby creature |
@@ -82,6 +87,13 @@ Each realm is built from deterministic 16×16 terrain chunks. Seven-by-seven chu
 | M | Realm atlas |
 | F2 | Mod marketplace |
 | C | Toggle Creative Mode |
+
+### Expedition play styles
+- **Wayfarer** — balanced survival and campaign progression.
+- **Pathfinder** — faster travel, slower hunger/thirst drain and extra ruin-discovery XP.
+- **Ranger** — bond with creatures without a cage; Guard companions deal more damage.
+- **Warden** — more hostile spawns, stronger enemy attacks and faster survival drain.
+- **Architect** — Creative Mode, no hostile spawns and unlimited building.
 | Esc | Pause |
 
 ## Community Mod Marketplace
