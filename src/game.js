@@ -237,8 +237,58 @@ function openModal(html){$('#modal-content').innerHTML=html;$('#game-modal').cla
 function closeModal(){$('#game-modal').classList.add('hidden');}
 function openInventory(){const entries=Object.entries(state.inventory).filter(([k,v])=>v>0);openModal('<span class="eyebrow">WAYFARER PACK</span><h2>Inventory & equipment</h2><p>Choose an item to assign it to the selected hotbar slot. Equip a weapon by selecting it, then attack with left click.</p><div class="inventory-grid">'+entries.map(([id,n])=>'<button class="inventory-cell" data-item="'+id+'">'+escapeHtml(itemDef(id).icon)+' <b>'+escapeHtml(itemDef(id).name)+'</b><small>× '+n+'</small></button>').join('')+'</div><div class="modal-actions"><button class="action-button secondary" id="open-craft-from-bag">CRAFTING</button><button class="action-button secondary" id="save-now">SAVE WORLD</button></div>');$$('[data-item]').forEach(b=>b.addEventListener('click',()=>{state.hotbar[state.selected]=b.dataset.item;renderHotbar();closeModal();toast(itemDef(b.dataset.item).name+' assigned to slot '+(state.selected+1));}));$('#open-craft-from-bag').onclick=openCrafting;$('#save-now').onclick=()=>saveGame();}
 function costLabel(cost){return Object.entries(cost).map(([id,n])=>escapeHtml(itemDef(id).icon)+' '+n+' '+escapeHtml(itemDef(id).name)).join(' · ');}
-function craftRecipe(r){if(!Object.entries(r.cost).every(([id,n])=>(state.inventory[id]||0)>=n)){toast('You do not have the required materials.');return false;}for(const [id,n] of Object.entries(r.cost))takeItem(id,n);for(const [id,n] of Object.entries(r.out))addItem(id,n);toast('Crafted '+r.label);return true;}
-function openCrafting(){const extra=contentOf('recipes').map(r=>({...r,mod:true}));const list=[...RECIPES,...extra];openModal('<span class="eyebrow">FIELD WORKBENCH</span><h2>Crafting.</h2><p>Convert gathered materials into equipment, supplies and building pieces.</p><div class="recipe-list">'+list.map((r,i)=>'<div class="recipe"><div><b>'+escapeHtml(r.label)+'</b><small>'+escapeHtml(r.desc||'')+'<br>'+costLabel(r.cost)+'</small></div><button class="action-button craft-one" data-recipe="'+i+'">CRAFT</button></div>').join('')+'</div>');$$('.craft-one').forEach(b=>b.addEventListener('click',()=>craftRecipe(list[Number(b.dataset.recipe)])));}
+function craftRecipe(r,quantity=1){
+ const multiplier=Math.max(1,Math.min(99,Math.floor(quantity)));
+ const canAfford=Object.entries(r.cost||{}).every(([id,n])=>state.mode==='creative'||(state.inventory[id]||0)>=n*multiplier);
+ if(!canAfford){toast('Missing materials. Check the ingredient ledger.');return false;}
+ if(state.mode!=='creative')for(const [id,n] of Object.entries(r.cost||{}))state.inventory[id]=(state.inventory[id]||0)-n*multiplier;
+ for(const [id,n] of Object.entries(r.out||{}))state.inventory[id]=(state.inventory[id]||0)+n*multiplier;
+ renderHotbar();renderStats();checkQuestProgress();checkCommunityQuestProgress();saveGame(false);
+ toast('Crafted '+(r.label||'item')+(multiplier>1?' ×'+multiplier:''));return true;
+}
+function recipeCategory(r){
+ const id=Object.keys(r.out||{})[0]||'',def=itemDef(id);
+ if(r.mod)return 'community';
+ if(def.type==='weapon')return 'weapons';
+ if(def.type==='tool')return 'tools';
+ if(def.type==='food'||def.type==='rest')return 'survival';
+ if(def.type==='vehicle')return 'travel';
+ if(def.type==='block'||def.placeable||def.buildShape)return 'building';
+ return 'all';
+}
+function openCrafting(){
+ const list=[...RECIPES,...contentOf('recipes').map(r=>({...r,mod:true}))];
+ let category='all',query='',selected=list[0]?.id||null;
+ const categories=[['all','All recipes'],['tools','Tools'],['weapons','Weapons'],['survival','Survival'],['building','Building'],['travel','Travel'],['community','Community']];
+ const render=()=>{
+  const filtered=list.map((r,index)=>({...r,_index:index,_category:recipeCategory(r)})).filter(r=>(category==='all'||r._category===category)&&((r.label+' '+(r.desc||'')).toLowerCase().includes(query.toLowerCase())));
+  if(!filtered.some(r=>r.id===selected))selected=filtered[0]?.id||null;
+  const active=filtered.find(r=>r.id===selected);
+  const nav=categories.map(([id,label])=>'<button class="workbench-filter '+(category===id?'active':'')+'" data-category="'+id+'">'+label+'</button>').join('');
+  const rows=filtered.map(r=>{
+   const output=Object.entries(r.out||{})[0]||['wood',1],def=itemDef(output[0]);
+   const affordable=Object.entries(r.cost||{}).every(([id,n])=>state.mode==='creative'||(state.inventory[id]||0)>=n);
+   return '<button class="workbench-recipe '+(selected===r.id?'selected':'')+'" data-select-recipe="'+r._index+'"><span class="workbench-icon">'+escapeHtml(def.icon)+'</span><span class="workbench-recipe-copy"><b>'+escapeHtml(r.label)+'</b><small>'+escapeHtml(r.desc||'')+'</small></span><span class="workbench-state '+(affordable?'ready':'missing')+'">'+(affordable?'READY':'GATHER')+'</span></button>';
+  }).join('');
+  let detail='<div class="workbench-empty"><span>✧</span><b>Select a recipe</b><small>Choose a design from the ledger to see its ingredients.</small></div>';
+  if(active){
+   const outputRows=Object.entries(active.out||{}).map(([id,n])=>'<span class="workbench-output">'+escapeHtml(itemDef(id).icon)+' '+escapeHtml(itemDef(id).name)+' <b>× '+n+'</b></span>').join('');
+   const ingredients=Object.entries(active.cost||{}).map(([id,n])=>{
+    const owned=state.inventory[id]||0,ok=state.mode==='creative'||owned>=n;
+    return '<div class="ingredient-row '+(ok?'owned':'short')+'"><span>'+escapeHtml(itemDef(id).icon)+' '+escapeHtml(itemDef(id).name)+'</span><b>'+owned+' / '+n+'</b></div>';
+   }).join('');
+   const affordable=Object.entries(active.cost||{}).every(([id,n])=>state.mode==='creative'||(state.inventory[id]||0)>=n);
+   detail='<div class="workbench-detail"><div class="workbench-detail-art">'+escapeHtml(itemDef(Object.keys(active.out||{})[0]||'wood').icon)+'</div><span class="eyebrow">'+(active.mod?'COMMUNITY DESIGN':'WAYFARER CRAFT')+'</span><h3>'+escapeHtml(active.label)+'</h3><p>'+escapeHtml(active.desc||'A useful field-made item.')+'</p><div class="workbench-section-label">OUTPUT</div><div class="workbench-outputs">'+outputRows+'</div><div class="workbench-section-label">INGREDIENT LEDGER</div><div class="ingredient-list">'+ingredients+'</div><div class="workbench-actions"><button class="button-primary workbench-craft" data-quantity="1" '+(!affordable?'disabled':'')+'>CRAFT ONE</button><button class="button-secondary workbench-craft" data-quantity="5" '+(!Object.entries(active.cost||{}).every(([id,n])=>state.mode==='creative'||(state.inventory[id]||0)>=n*5)?'disabled':'')+'>CRAFT ×5</button></div>'+(state.mode==='creative'?'<small class="workbench-note">Creative mode · ingredients are not consumed.</small>':'<small class="workbench-note">Material counts update as you craft.</small>')+'</div>';
+  }
+  openModal('<div class="workbench"><header class="workbench-header"><div><span class="eyebrow">WAYFARER WORKSHOP · DESIGN LEDGER</span><h2>Make it. Make it yours.</h2><p>Turn gathered materials into tools, provisions, weapons and pieces for your next build.</p></div><div class="workbench-stock"><small>AVAILABLE MATERIALS</small><b>'+Object.entries(state.inventory).filter(([id,n])=>n>0&&itemDef(id).type==='material').length+' <span>types in pack</span></b></div></header><div class="workbench-toolbar"><nav class="workbench-filters">'+nav+'</nav><label class="workbench-search"><span>⌕</span><input id="workbench-search" placeholder="Find a design…" value="'+escapeHtml(query)+'"></label></div><div class="workbench-body"><div class="workbench-list"><div class="workbench-list-head"><b>DESIGN INDEX</b><small>'+filtered.length+' RECIPES</small></div>'+(rows||'<div class="workbench-empty"><b>No designs found</b><small>Try another search or category.</small></div>')+'</div><div class="workbench-detail-wrap">'+detail+'</div></div><footer class="workbench-footer"><span>Crafting is persistent · The materials you spend are saved with your expedition.</span><button class="text-link" id="open-build-from-workbench">OPEN BUILD MODE ↗</button></footer></div>');
+  $('.workbench-filter').forEach(b=>b.onclick=()=>{category=b.dataset.category;render();});
+  $('#workbench-search').oninput=e=>{const activeId=selected;query=e.target.value;selected=activeId;render();const input=$('#workbench-search');input.focus();input.setSelectionRange(query.length,query.length);};
+  $('.workbench-recipe').forEach(b=>b.onclick=()=>{selected=list[Number(b.dataset.selectRecipe)].id;render();});
+  $('.workbench-craft').forEach(b=>b.onclick=()=>{if(active){craftRecipe(active,Number(b.dataset.quantity));render();}});
+  $('#open-build-from-workbench').onclick=()=>{closeModal();toggleBuildMode(true);};
+ };
+ render();
+}
 function openJournal(){const active=quests.filter(q=>state.quests.includes(q.id));const done=quests.filter(q=>state.completed.includes(q.id));const side=contentOf('quests');const lore=contentOf('lore');const ruinCount=(state.lootedRuins||[]).length,vaultClears=Object.values(state.dungeonRecords||{}).reduce((sum,n)=>sum+n,0),town=state.settlement||{};openModal('<span class="eyebrow">THE WAYFARER CHRONICLE</span><h2>Journal & discoveries.</h2><p>Anchor Shards: '+state.shards.length+'/4 · Ruin caches: '+ruinCount+' · Vault clears: '+vaultClears+' · Settlement: Lv '+(town.level||1)+' / '+(town.population||1)+' residents</p><p>Realms discovered: '+escapeHtml(state.discovered.join(', '))+'</p><h3>Campaign</h3><div class="quest-list">'+active.map(q=>'<div class="quest"><div><b>'+q.name+'</b><small>'+q.desc+'</small></div><span class="pill">ACTIVE</span></div>').join('')+(active.length?'':'<div class="empty-state">No active campaign objectives.</div>')+'</div><h3>Completed</h3><div class="quest-list">'+done.map(q=>'<div class="quest"><div><b>'+q.name+'</b><small>'+q.reward+'</small></div><span class="pill">DONE</span></div>').join('')+'</div><h3>Community quests</h3><div class="quest-list">'+side.map(q=>'<div class="quest"><div><b>'+escapeHtml(q.name)+'</b><small>'+escapeHtml(q.description)+'</small></div><span class="pill">MOD</span></div>').join('')+'</div><h3>Community discoveries</h3><div class="quest-list">'+lore.map(entry=>'<div class="quest"><div><b>'+escapeHtml(entry.title)+'</b><small>'+escapeHtml(entry.text)+'</small></div><span class="pill">LORE</span></div>').join('')+(lore.length?'':'<div class="empty-state">No community lore installed.</div>')+'</div>');}
 function openAtlas(){openModal('<span class="eyebrow">THE FOURFOLD ATLAS</span><h2>Choose a realm.</h2><p>Travel is open in this 0.6 expedition build. Each realm has its own procedural landscape, resources, wildlife and guardian.</p><div class="realm-grid">'+Object.keys(REALMS).map(n=>'<button class="realm-tile '+REALMS[n].id+'" data-travel="'+n+'"><span>'+REALMS[n].icon+' '+n.toUpperCase()+'</span><b>'+REALMS[n].guardian+'</b><small>'+REALMS[n].desc+'</small></button>').join('')+contentOf('dimensions').map(n=>'<button class="realm-tile umbral" data-travel="'+escapeHtml(n.name)+'"><span>✧ COMMUNITY REALM</span><b>'+escapeHtml(n.name)+'</b><small>'+escapeHtml(n.description)+'</small></button>').join('')+'</div>');$$('[data-travel]').forEach(b=>b.addEventListener('click',()=>{changeRealm(b.dataset.travel);closeModal();toast('Crossed into '+b.dataset.travel+'.');}));}
 function openJournalAndResume(){openJournal();}
