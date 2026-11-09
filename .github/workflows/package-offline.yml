@@ -28,7 +28,7 @@ jobs:
       - name: Vendor Three.js and assemble offline game
         run: |
           npm install --prefix .offline-deps --no-save --no-package-lock --no-audit --no-fund three@0.180.0
-          DIST="dist/fourfold-wildbound-0.7-offline"
+          DIST="dist/fourfold-wildbound-0.7.2-offline"
           mkdir -p "$DIST/vendor"
           cp index.html "$DIST/index.html"
           cp -R src "$DIST/src"
@@ -39,7 +39,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import json
-          root = Path("dist/fourfold-wildbound-0.7-offline")
+          root = Path("dist/fourfold-wildbound-0.7.2-offline")
           index = root / "index.html"
           html = index.read_text(encoding="utf-8")
           cdn = "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"
@@ -51,7 +51,7 @@ jobs:
           style = css.read_text(encoding="utf-8")
           style = "\n".join(line for line in style.splitlines() if not line.strip().startswith("@import url(")) + "\n"
           css.write_text(style, encoding="utf-8")
-          readme = """FOURFOLD: WILDBOUND — 0.7 OFFLINE EDITION
+          readme = """FOURFOLD: WILDBOUND — 0.7.2 OFFLINE EDITION
           ======================================
 
           This folder contains the game, its marketplace data packs and a local copy
@@ -77,7 +77,7 @@ jobs:
           settlement systems and exploration work offline. Import by local JSON file
           also works offline. Import by URL and GitHub submission links need internet.
 
-          This is the browser prototype build of FOURFOLD 0.7.
+          This is the browser prototype build of FOURFOLD 0.7.2.
           """
           (root / "OFFLINE-README.txt").write_text(readme, encoding="utf-8")
           bat = r"""@echo off
@@ -114,11 +114,11 @@ jobs:
           (root / "LAUNCH-MAC-LINUX.sh").write_text(sh, encoding="utf-8")
           PY
           chmod +x "$DIST/LAUNCH-MAC-LINUX.sh"
-          (cd dist && zip -qr FOURFOLD-WILDBOUND-0.7-OFFLINE.zip fourfold-wildbound-0.7-offline)
+          (cd dist && zip -qr FOURFOLD-WILDBOUND-0.7.2-OFFLINE.zip fourfold-wildbound-0.7.2-offline)
       - name: Upload offline package
         uses: actions/upload-artifact@v4
         with:
-          name: FOURFOLD-WILDBOUND-0.7-OFFLINE
-          path: dist/FOURFOLD-WILDBOUND-0.7-OFFLINE.zip
+          name: FOURFOLD-WILDBOUND-0.7.2-OFFLINE
+          path: dist/FOURFOLD-WILDBOUND-0.7.2-OFFLINE.zip
           if-no-files-found: error
           retention-days: 30
