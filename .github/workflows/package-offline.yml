@@ -1,0 +1,124 @@
+name: Package FOURFOLD offline build
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'src/**'
+      - 'marketplace/**'
+      - 'mods/**'
+      - '.github/workflows/package-offline.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate game and marketplace
+        run: |
+          node --input-type=module --check < src/game.js
+          python3 scripts/validate-marketplace.py
+      - name: Vendor Three.js and assemble offline game
+        run: |
+          npm install --prefix .offline-deps --no-save --no-package-lock --no-audit --no-fund three@0.180.0
+          DIST="dist/fourfold-wildbound-0.7-offline"
+          mkdir -p "$DIST/vendor"
+          cp index.html "$DIST/index.html"
+          cp -R src "$DIST/src"
+          cp -R marketplace "$DIST/marketplace"
+          cp -R mods "$DIST/mods"
+          cp -R .offline-deps/node_modules/three/build/. "$DIST/vendor/"
+          cp .offline-deps/node_modules/three/LICENSE "$DIST/vendor/THREE-LICENSE.txt"
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          root = Path("dist/fourfold-wildbound-0.7-offline")
+          index = root / "index.html"
+          html = index.read_text(encoding="utf-8")
+          cdn = "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"
+          if cdn not in html:
+              raise SystemExit("Expected Three.js import-map entry was not found.")
+          html = html.replace(cdn, "./vendor/three.module.js")
+          index.write_text(html, encoding="utf-8")
+          css = root / "src/style.css"
+          style = css.read_text(encoding="utf-8")
+          style = "\n".join(line for line in style.splitlines() if not line.strip().startswith("@import url(")) + "\n"
+          css.write_text(style, encoding="utf-8")
+          readme = """FOURFOLD: WILDBOUND — 0.7 OFFLINE EDITION
+          ======================================
+
+          This folder contains the game, its marketplace data packs and a local copy
+          of the Three.js runtime. No internet connection is required to play.
+
+          WINDOWS
+          1. Install Python 3 from python.org if it is not already installed.
+          2. Double-click LAUNCH-WINDOWS.bat.
+          3. Your browser opens http://127.0.0.1:8765.
+          4. Keep the small server window open while playing. Close it to stop.
+
+          OTHER COMPUTERS
+          Open a terminal in this folder and run:
+              python3 -m http.server 8765
+          Then open:
+              http://127.0.0.1:8765
+
+          Do not open index.html directly with file://. Browsers restrict local
+          module and catalogue requests in that mode; use the included local server.
+
+          The world save and installed mods remain in the browser's local storage.
+          The static marketplace, all nine included packs, crafting, creatures,
+          settlement systems and exploration work offline. Import by local JSON file
+          also works offline. Import by URL and GitHub submission links need internet.
+
+          This is the browser prototype build of FOURFOLD 0.7.
+          """
+          (root / "OFFLINE-README.txt").write_text(readme, encoding="utf-8")
+          bat = r"""@echo off
+          setlocal
+          cd /d "%~dp0"
+          where py >nul 2>nul
+          if errorlevel 1 (
+            where python >nul 2>nul
+            if errorlevel 1 (
+              echo Python 3 is required. Install it from https://www.python.org/downloads/
+              pause
+              exit /b 1
+            )
+            start "FOURFOLD local server" /min cmd /c "python -m http.server 8765"
+          ) else (
+            start "FOURFOLD local server" /min cmd /c "py -m http.server 8765"
+          )
+          timeout /t 2 /nobreak >nul
+          start "" "http://127.0.0.1:8765"
+          echo FOURFOLD is running locally. Close the server window to stop it.
+          """
+          (root / "LAUNCH-WINDOWS.bat").write_text(bat, encoding="utf-8")
+          sh = r'''#!/bin/sh
+          cd "$(dirname "$0")"
+          python3 -m http.server 8765 &
+          SERVER_PID=$!
+          sleep 2
+          if command -v open >/dev/null 2>&1; then open "http://127.0.0.1:8765"
+          elif command -v xdg-open >/dev/null 2>&1; then xdg-open "http://127.0.0.1:8765"
+          fi
+          echo "FOURFOLD is running locally. Press Ctrl+C to stop."
+          wait "$SERVER_PID"
+          '''
+          (root / "LAUNCH-MAC-LINUX.sh").write_text(sh, encoding="utf-8")
+          PY
+          chmod +x "$DIST/LAUNCH-MAC-LINUX.sh"
+          zip -qr dist/FOURFOLD-WILDBOUND-0.7-OFFLINE.zip "$DIST"
+      - name: Upload offline package
+        uses: actions/upload-artifact@v4
+        with:
+          name: FOURFOLD-WILDBOUND-0.7-OFFLINE
+          path: dist/FOURFOLD-WILDBOUND-0.7-OFFLINE.zip
+          if-no-files-found: error
+          retention-days: 30
