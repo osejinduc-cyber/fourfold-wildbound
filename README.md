@@ -5,7 +5,7 @@ An original 3D voxel open-world survival adventure prototype. Explore four proce
 ## Play locally
 
 ### Offline edition
-A downloadable offline package is built by GitHub Actions. Open [Package FOURFOLD offline build](https://github.com/osejinduc-cyber/fourfold-wildbound/actions/workflows/package-offline.yml), select the latest successful run, and download the `FOURFOLD-WILDBOUND-0.7-OFFLINE` artifact. It contains the local Three.js runtime, game source, all nine marketplace packs and launch instructions. On Windows, extract the ZIP and run `LAUNCH-WINDOWS.bat` (Python 3 required). No CDN or network connection is needed for play.
+A downloadable offline package is built by GitHub Actions. Open [Package FOURFOLD offline build](https://github.com/osejinduc-cyber/fourfold-wildbound/actions/workflows/package-offline.yml), select the latest successful run, and download the `FOURFOLD-WILDBOUND-0.7.2-OFFLINE` artifact. It contains the local Three.js runtime, game source, all nine marketplace packs and launch instructions. On Windows, extract the ZIP and run `LAUNCH-WINDOWS.bat` (Python 3 required). No CDN or network connection is needed for play.
 
 ### Run from a repository checkout
 From the repository root, run:
