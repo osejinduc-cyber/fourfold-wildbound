@@ -3,13 +3,18 @@
 An original 3D voxel open-world survival adventure prototype. Explore four procedural realms, gather resources, craft gear, build shelters, bond with wild creatures, defeat guardians, and expand your expedition with downloadable community content.
 
 ## Play locally
-This is a static browser game using Three.js from jsDelivr. From the repository root, run:
+
+### Offline edition
+A downloadable offline package is built by GitHub Actions. Open [Package FOURFOLD offline build](https://github.com/osejinduc-cyber/fourfold-wildbound/actions/workflows/package-offline.yml), select the latest successful run, and download the `FOURFOLD-WILDBOUND-0.7-OFFLINE` artifact. It contains the local Three.js runtime, game source, all nine marketplace packs and launch instructions. On Windows, extract the ZIP and run `LAUNCH-WINDOWS.bat` (Python 3 required). No CDN or network connection is needed for play.
+
+### Run from a repository checkout
+From the repository root, run:
 
 ```bash
 python -m http.server 8000
 ```
 
-Open **http://localhost:8000**. A network connection is needed to load Three.js and the community marketplace catalogue.
+Open **http://localhost:8000**. The standard source checkout uses Three.js from jsDelivr; use the offline package above when you need a fully self-contained copy.
 
 ## Publish on GitHub Pages
 1. Open repository **Settings → Pages**.
@@ -18,6 +23,9 @@ Open **http://localhost:8000**. A network connection is needed to load Three.js 
 4. Open the Pages URL shown by the successful workflow.
 
 The workflow is in `.github/workflows/pages.yml`.
+
+## Interface and art direction
+The 0.7 Field Journal visual pass uses a restrained stone, pine and aged-brass palette, numbered navigation, editorial typography, clearer page hierarchy and quieter panels. Google Fonts were removed from the stylesheet so the interface falls back to local system fonts. World lighting and emissive materials were toned down to reduce the glossy, synthetic look while keeping the existing low-poly procedural art style.
 
 ## The story
 The Heart Loom once linked four dimensions. The Sundering shattered it into four Anchor Shards and broke the roads between worlds. You awaken as a Wayfarer beneath a Seed Beacon. Recover the shards from the realm guardians, discover the old ruins, then return to the Beacon to summon the Pale Cartographer—the architect of the catastrophe.
