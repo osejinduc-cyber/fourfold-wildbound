@@ -49,14 +49,14 @@ camera.rotation.order='YXZ';
 const renderer = new THREE.WebGLRenderer({antialias:true,alpha:false});
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.7)); renderer.setSize(innerWidth,innerHeight);
 renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=.96;
 $world.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xd9efdc,0x35443a,1.9));
-const sun=new THREE.DirectionalLight(0xffe7bd,2.6); sun.position.set(-35,55,24); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.left=-42;sun.shadow.camera.right=42;sun.shadow.camera.top=42;sun.shadow.camera.bottom=-42;scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xd5d9c8,0x394238,1.35));
+const sun=new THREE.DirectionalLight(0xe5d8b8,2.05); sun.position.set(-35,55,24); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.left=-42;sun.shadow.camera.right=42;sun.shadow.camera.top=42;sun.shadow.camera.bottom=-42;scene.add(sun);
 const cubeGeo=new THREE.BoxGeometry(1,1,1);
 const sphereGeo=new THREE.SphereGeometry(.5,10,8);
 const mats={};
-function material(color,rough=.88,metal=0,emissive=0){const k=[color,rough,metal,emissive].join(':');if(!mats[k])mats[k]=new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,emissive:emissive||0,emissiveIntensity:emissive?1:0});return mats[k]}
+function material(color,rough=.88,metal=0,emissive=0){const k=[color,rough,metal,emissive].join(':');if(!mats[k])mats[k]=new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal,emissive:emissive||0,emissiveIntensity:emissive?.42:0});return mats[k]}
 const worldGroup=new THREE.Group();scene.add(worldGroup);
 const CHUNK_SIZE=16,CHUNK_RADIUS=3;let loadedChunks=new Map(),lastChunkCenter='';
 let blocks=[], enemies=[], creatures=[], interactables=[], particles=[], trees=[], worldObjects=[];
@@ -177,7 +177,7 @@ function updateChunks(x,z,force=false){
 function generateRealm(name){
  state.realm=name;state.activeDungeon={active:false,realm:name};const d=getRealmDef(name);clearWorld();
  scene.background=new THREE.Color(d.sky);scene.fog.color.setHex(d.fog);scene.fog.density=name==='Umbral Wilds'?.022:.012;
- sun.color.setHex(name==='Cinderdeep'?0xff9c68:name==='Umbral Wilds'?0xc3b2ef:0xffe7bd);sun.intensity=name==='Cinderdeep'?1.6:2.5;
+ sun.color.setHex(name==='Cinderdeep'?0xff9c68:name==='Umbral Wilds'?0xc3b2ef:0xffe7bd);sun.intensity=name==='Cinderdeep'?1.45:1.95;
  player.x=0;player.z=8;player.y=terrainHeight(0,8)+2;verticalVelocity=0;
  updateChunks(player.x,player.z,true);
  beacon=makeBeacon();portal=makePortal();dungeon=makeDungeon();
@@ -289,7 +289,7 @@ function updateCompanions(dt){let foragers=0;for(const c of creatures){const u=c
 function respawn(){state.health=55;player.x=0;player.z=8;player.y=terrainHeight(0,8)+2;state.inventory.meat=Math.max(0,(state.inventory.meat||0)-1);toast('You were returned to the last Seed Beacon. One ration was lost.');renderStats();}
 function updateSurvival(dt){if(state.mode==='creative'){state.hunger=100;state.thirst=100;state.warmth=100;state.health=100;state.stamina=100;return;}hungerTimer+=dt;thirstTimer+=dt;if(hungerTimer>18){hungerTimer=0;state.hunger=clamp(state.hunger-.72,0,100);if(state.hunger===0)state.health=clamp(state.health-.45,0,100);else if(state.hunger>70&&state.health<100)state.health=clamp(state.health+.18,0,100);}if(thirstTimer>14){thirstTimer=0;state.thirst=clamp((state.thirst??100)-.9,0,100);if(state.thirst===0)state.health=clamp(state.health-.65,0,100);}if(keys.ShiftLeft&&state.stamina>0)state.stamina=clamp(state.stamina-24*dt,0,100);else state.stamina=clamp(state.stamina+15*dt,0,100);const coldRealm=state.realm==='Umbral Wilds';const campfireNear=(state.campfires||[]).some(p=>p.realm===state.realm&&Math.hypot(p.x-player.x,p.z-player.z)<9);if(campfireNear)state.warmth=clamp((state.warmth??100)+2.4*dt,0,100);else if(coldRealm)state.warmth=clamp((state.warmth??100)-.18*dt,0,100);else state.warmth=clamp((state.warmth??100)-.025*dt,0,100);if(state.warmth<18)state.stamina=clamp(state.stamina-.25*dt,0,100);if(state.thirst<18)state.stamina=clamp(state.stamina-.2*dt,0,100);if(state.realm==='Cinderdeep'&&state.inventory.ember<=0&&Math.sin(performance.now()*.0004)>.92)state.health=clamp(state.health-.12,0,100);if(state.realm==='Umbral Wilds'&&Math.sin(performance.now()*.00025)>.92)state.stamina=clamp(state.stamina-.1,0,100);renderStats();if(state.health<=0)respawn();}
 function updateSettlement(dt){const farms=(state.settlement?.buildings||[]).filter(b=>b.type==='farm').length;if(!farms)return;state.settlement.farmTimer=(state.settlement.farmTimer||0)+dt;if(state.settlement.farmTimer>=90){state.settlement.farmTimer=0;const yieldCount=Math.min(farms,3);state.inventory.berry=(state.inventory.berry||0)+yieldCount;renderHotbar();toast('Your Verdant farms harvested '+yieldCount+' Sunberries.');saveGame(false);}}
-function updateDayNight(dt){dayTime+=dt*.004;const light=.65+Math.sin(dayTime)*.35;sun.intensity=state.realm==='Cinderdeep'?1.5:1.3+light*1.4;sun.position.set(Math.cos(dayTime)*40,30+Math.sin(dayTime)*35,Math.sin(dayTime)*30);}
+function updateDayNight(dt){dayTime+=dt*.004;const light=.72+Math.sin(dayTime)*.2;sun.intensity=state.realm==='Cinderdeep'?1.35:1.45+light*.62;sun.position.set(Math.cos(dayTime)*40,30+Math.sin(dayTime)*35,Math.sin(dayTime)*30);}
 function animate(){requestAnimationFrame(animate);const now=performance.now(),dt=Math.min((now-lastTime)/1000,.04);lastTime=now;if(started&&!paused){const f=(keys.KeyW?1:0)-(keys.KeyS?1:0),s=(keys.KeyD?1:0)-(keys.KeyA?1:0);const run=keys.ShiftLeft&&state.stamina>2,speed=(player.speed||5.2)*(run?1.5:1);const dir=new THREE.Vector3(s,0,-f).normalize().applyAxisAngle(new THREE.Vector3(0,1,0),lookYaw);player.x+=dir.x*speed*dt;player.z+=dir.z*speed*dt;player.x=clamp(player.x,-65536,65536);player.z=clamp(player.z,-65536,65536);updateChunks(player.x,player.z);const ground=terrainHeight(Math.round(player.x),Math.round(player.z))+1.65;if(keys.Space&&player.grounded){verticalVelocity=7;player.grounded=false;}verticalVelocity-=19*dt;player.y+=verticalVelocity*dt;if(player.y<=ground){player.y=ground;verticalVelocity=0;player.grounded=true;}camera.position.set(player.x,player.y,player.z);if(vehicleRig){vehicleRig.position.set(player.x,player.y-.95,player.z);vehicleRig.rotation.y=lookYaw;}camera.rotation.set(lookPitch,lookYaw,0);player.attackCooldown=Math.max(0,player.attackCooldown-dt);updateEnemies(dt);updateWildlife(dt);updateCompanions(dt);updateSurvival(dt);updateSettlement(dt);updateDayNight(dt);updateInteractions();updateBossHud();}renderer.render(scene,camera);}
 function changeRealm(name){state.realm=name;state.discovered=[...new Set([...state.discovered,name])];player.x=0;player.z=8;player.y=terrainHeight(0,8)+2;generateRealm(name);state.activeDungeon={active:false,realm:name};saveGame(false);if(state.quests.includes('first-gate')&&state.discovered.length>1)changeQuest('first-gate');}
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);}
