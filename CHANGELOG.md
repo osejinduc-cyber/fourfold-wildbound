@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.2 — Workbench, First-Person Equipment & Building
+
+- Replaced the plain recipe list with a redesigned workbench: All, Tools, Weapons, Survival, Building, Travel and Community filters; live recipe search; selected design details; ingredient counts; output previews; and batch craft ×5.
+- Changed crafting to consume and grant materials in one saved transaction, with Creative Mode bypassing ingredient costs.
+- Added a camera-mounted low-poly forearm, cuff, hand and item silhouettes. Tools, weapons, blocks, food and vehicles display different held models, and the model refreshes when the selected hotbar slot changes.
+- Added Build Mode (G), a snapped wireframe placement preview, blocked-space feedback, and 90-degree rotation (Z).
+- Added a build catalogue (H) that assigns structural pieces to the selected hotbar slot.
+- Added craftable structural pieces: timber floors, beams, stairs, fences, doors, Cloudglass panes, roof tiles, stone paths and lanterns.
+- Saved building-piece identity and rotation in terrain edits and restored the correct piece when its chunk streams back in.
+- Added five expedition presets: Wayfarer, Pathfinder, Ranger, Warden and Architect, each with gameplay modifiers.
+- Added crafting, held equipment, building and play-style controls to the HUD; updated the responsive workbench and selection-card styling.
+
 ## 0.7.1 — The Field Journal Visual Pass
 
 - Reworked the main menu as a quieter, editorial field journal with numbered navigation, clearer hierarchy, improved realm/marketplace cards and a four-part world facts strip.
