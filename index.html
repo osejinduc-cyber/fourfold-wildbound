@@ -4,9 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1713">
-<meta name="description" content="FOURFOLD: WILDBOUND 0.6 — explore four realms, build your refuge, tame strange creatures, and expand your world with community content.">
+<meta name="description" content="FOURFOLD: WILDBOUND — a handcrafted survival adventure across four living realms. Build a settlement, bond with wildlife and discover the old roads.">
 <title>FOURFOLD: WILDBOUND — 0.7</title>
 <link rel="stylesheet" href="./src/style.css">
+<link rel="stylesheet" href="./src/style-refined.css">
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js"}}</script>
 </head>
 <body>
@@ -22,30 +23,31 @@
     <div class="menu-bg-glow"></div>
     <aside class="sidebar">
       <div class="brand"><div class="brand-mark"><i></i><i></i><i></i><i></i></div><div><strong>FOURFOLD</strong><small>WILDBOUND</small></div></div>
-      <div class="sidebar-label">WAYFARER'S ATLAS</div>
+      <div class="sidebar-label">THE WAYFARER'S JOURNAL</div>
       <nav class="side-nav">
-        <button class="nav-button selected" data-page="home"><span>⌂</span> Home</button>
-        <button class="nav-button" data-page="realms"><span>✧</span> Realms <em>4</em></button>
-        <button class="nav-button" data-page="market"><span>⬡</span> Mod Marketplace <em class="nav-count" id="market-count">6</em></button>
-        <button class="nav-button" data-page="library"><span>▣</span> My Mods <em id="installed-count">0</em></button>
-        <button class="nav-button" data-page="chronicle"><span>☷</span> Chronicle</button>
-        <button class="nav-button" data-page="settings"><span>⚙</span> Settings</button>
+        <button class="nav-button selected" data-page="home"><span>01</span> Home</button>
+        <button class="nav-button" data-page="realms"><span>02</span> Realms <em>4</em></button>
+        <button class="nav-button" data-page="market"><span>03</span> Marketplace <em class="nav-count" id="market-count">9</em></button>
+        <button class="nav-button" data-page="library"><span>04</span> My Collection <em id="installed-count">0</em></button>
+        <button class="nav-button" data-page="chronicle"><span>05</span> Chronicle</button>
+        <button class="nav-button" data-page="settings"><span>06</span> Settings</button>
       </nav>
-      <div class="sidebar-bottom"><span class="status-pip"></span> OFFLINE WORLD · LOCAL SAVE <small>VERSION 0.7.0</small></div>
+      <div class="sidebar-bottom"><span class="status-pip"></span> LOCAL EXPEDITION · SINGLE PLAYER <small>VERSION 0.7.0</small></div>
     </aside>
 
     <main class="menu-main">
-      <div class="menu-topline"><span>THE WORLD IS WIDER THAN YOU REMEMBER</span><span id="menu-date">THE LIVING WORLDS UPDATE · 0.7</span></div>
+      <div class="menu-topline"><span>FIELD NOTES · FOUR REALMS · ONE SHARED HISTORY</span><span id="menu-date">THE LIVING WORLDS UPDATE · 0.7</span></div>
       <section class="menu-page active" data-panel="home">
-        <div class="hero-copy"><span class="eyebrow">THE SUNDERING CHANGED EVERYTHING</span><h1>Four worlds.<br><i>One broken fate.</i></h1><p>The Heart Loom is silent. Its Anchor Shards lie scattered across the realms. Build a refuge, discover the wilds, and decide what should happen when the worlds are joined again.</p>
-          <div class="hero-actions"><button id="continue-button" class="button-primary">ENTER THE WILDS <b>↗</b></button><button id="new-world-button" class="button-secondary">NEW EXPEDITION</button></div>
+        <div class="hero-copy"><span class="eyebrow">A WAYFARER'S FIELD JOURNAL · ENTRY 001</span><h1>A world worth<br><i>getting lost in.</i></h1><p>Follow forgotten roads through four distinct realms. Gather what the wilds offer, make a home beneath the Seed Beacon, and uncover the truth behind the broken Heart Loom.</p>
+          <div class="hero-actions"><button id="continue-button" class="button-primary">CONTINUE EXPEDITION <b>↗</b></button><button id="new-world-button" class="button-secondary">BEGIN A NEW WORLD</button></div>
         </div>
+        <div class="home-metrics"><div><b>04</b><span>Distinct realms</span></div><div><b>16×16</b><span>Streaming terrain chunks</span></div><div><b>09</b><span>Community creations</span></div><div><b>01</b><span>World. Your story.</span></div></div>
         <div class="home-cards">
-          <article class="feature-card realm-card verdantia"><div class="card-meta">01 / THE FIRST REALM</div><div><h3>Verdantia</h3><p>Where the roots remember.</p></div></article>
-          <article class="feature-card loom-card"><div class="card-meta">YOUR PURPOSE</div><div><h3>Restore the<br>Heart Loom</h3><p>Four Anchor Shards. Four guardians.</p></div></article>
-          <article class="feature-card mod-card"><div class="card-meta">COMMUNITY CREATIONS</div><div><h3>Make the wilds<br>your own.</h3><p>New creatures, realms, gear and stories.</p><button class="text-link" data-goto="market">EXPLORE THE MARKETPLACE →</button></div></article>
+          <article class="feature-card realm-card verdantia"><div class="card-meta">01 — THE ROOTBOUND</div><div><h3>Verdantia</h3><p>Old forests, quiet rivers and the first home.</p></div></article>
+          <article class="feature-card loom-card"><div class="card-meta">THE LONG THREAD</div><div><h3>The Heart Loom</h3><p>Four lost Anchors. A history worth unravelling.</p></div></article>
+          <article class="feature-card mod-card"><div class="card-meta">MADE BY THE COMMUNITY</div><div><h3>Room to make it yours.</h3><p>Creatures, places, gear and new stories.</p><button class="text-link" data-goto="market">BROWSE THE COLLECTION →</button></div></article>
         </div>
-        <div class="home-footer"><span>LAST EXPEDITION <b id="last-save-label">No expedition saved</b></span><span>LOCAL WORLDS <b>1 PLAYER</b></span><span>COMMUNITY CONTENT <b>DATA PACKS</b></span></div>
+        <div class="home-footer"><span>LAST EXPEDITION <b id="last-save-label">No expedition saved</b></span><span>PLAY STYLE <b>EXPLORE · BUILD · SURVIVE</b></span><span>COMMUNITY CONTENT <b>DATA PACKS</b></span></div>
       </section>
       <section class="menu-page" data-panel="realms">
         <div class="page-heading"><span class="eyebrow">THE FOURFOLD ATLAS</span><h2>Choose your horizon.</h2><p>Each realm generates its own terrain, resources, hazards and guardian. Discover a realm gate to travel between worlds.</p></div>
