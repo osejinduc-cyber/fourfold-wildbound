@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.1 — The Field Journal Visual Pass
+
+- Reworked the main menu as a quieter, editorial field journal with numbered navigation, clearer hierarchy, improved realm/marketplace cards and a four-part world facts strip.
+- Replaced glow-heavy gradients with a restrained pine, stone and aged-brass palette, squared card edges and more consistent spacing.
+- Updated pause, HUD, inventory, crafting and modal styling to share the same visual language.
+- Removed the remote Google Fonts import and introduced system-font fallbacks.
+- Reduced scene exposure, ambient light and emissive intensity to make the low-poly world less glossy and synthetic.
+- Added a GitHub Actions workflow that vendors the Three.js build and produces a self-contained offline ZIP with all nine marketplace packs and Windows/macOS/Linux launch instructions.
+
 ## 0.7.0 — The Living Worlds Update
 
 ### Expanding worlds
